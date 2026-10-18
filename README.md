@@ -14,7 +14,7 @@ Career map: ![Street Velocity career map](Web_Game/screenshots/web-career.png)
 
 ## Unity Android/iOS setup
 
-Follow [`UNITY_SETUP_CHECKLIST.md`](UNITY_SETUP_CHECKLIST.md) to generate scenes and play. Unity 2022.3 LTS or newer is required. The generated native prototype includes sprint, a three-stage circuit route, drift scoring, a 15-second time trial, moving rivals, traffic, and police pursuit actors. Unity's circuit currently uses a straight generated street; rival placement rules, police capture conditions, production 3D assets, and device QA remain future work. Unity Editor compilation and device builds have not been run in this workspace.
+Follow [`UNITY_SETUP_CHECKLIST.md`](UNITY_SETUP_CHECKLIST.md) to generate scenes and play. Unity 2022.3 LTS or newer is required. The generated native prototype includes sprint, a three-stage circuit route, drift scoring, a 15-second time trial, moving rivals, traffic, and police pursuit actors. Rivals affect place/rewards, and sustained police proximity can bust the player. Unity's circuit currently uses a straight generated street; advanced opponent driving, production 3D assets, and device QA remain future work. Unity Editor compilation and device builds have not been run in this workspace.
 
 ## Web edition
 
