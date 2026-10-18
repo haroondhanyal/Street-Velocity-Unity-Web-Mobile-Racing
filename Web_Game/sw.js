@@ -1,4 +1,4 @@
-const CACHE = 'street-velocity-v2';
+const CACHE = 'street-velocity-v3';
 const FILES = ['./', './index.html', './style.css', './visuals.css', './race-render.js', './game.js', './manifest.webmanifest', './assets/neon-district.png', './assets/street-car.png', './assets/icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))));
