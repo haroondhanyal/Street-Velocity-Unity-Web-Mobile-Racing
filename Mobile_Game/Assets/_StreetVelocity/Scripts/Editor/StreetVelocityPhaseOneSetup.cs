@@ -107,8 +107,8 @@ namespace StreetVelocity.EditorTools
                 new[] { ("CUSTOMIZE", "customize"), ("UPGRADES", "upgrades"), ("CAR SELECTION", "cars") });
             CreatePanel<GarageScreen>(canvas.transform, router, "customize", "CUSTOMIZATION", "Paint · Rims · Spoiler · Tint · Plate", panels,
                 new[] { ("SAVE LOOK", "garage"), ("UPGRADES", "upgrades") });
-            CreatePanel<GarageScreen>(canvas.transform, router, "upgrades", "UPGRADE SCREEN", "Engine · Turbo · ECU · Transmission · Tires · Brakes · Nitro", panels,
-                new[] { ("GARAGE", "garage"), ("RACE GRID", "race-start"), ("UPGRADE ENGINE · 15,000 CR", "UPGRADE_ENGINE") });
+            CreatePanel<GarageScreen>(canvas.transform, router, "upgrades", "UPGRADE SCREEN", "Install parts and improve the selected car's race performance", panels,
+                new[] { ("ENGINE", "UPGRADE_PART_0"), ("TURBO", "UPGRADE_PART_1"), ("ECU", "UPGRADE_PART_2"), ("TRANSMISSION", "UPGRADE_PART_3"), ("TIRES", "UPGRADE_PART_4"), ("BRAKES", "UPGRADE_PART_5"), ("SUSPENSION", "UPGRADE_PART_6"), ("NITRO", "UPGRADE_PART_7"), ("GARAGE", "garage"), ("RACE GRID", "race-start") });
             CreatePanel<RaceResultsScreen>(canvas.transform, router, "race-start", "RACE START", "Downtown · Event grid · Weather · Mobile controls", panels,
                 new[] { ("START RACE", "09_DriveTest"), ("WEATHER", "weather"), ("CONTROLS", "controls") });
             CreatePanel<RaceResultsScreen>(canvas.transform, router, "race", "IN-RACE HUD", "Position · Lap · Timer · Minimap · Steering · Nitro", panels,
@@ -217,14 +217,27 @@ namespace StreetVelocity.EditorTools
                 buttonRect.anchorMin = buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
                 buttonRect.sizeDelta = new Vector2(350, 64);
                 buttonRect.anchoredPosition = new Vector2(0, y);
+                if (id == "upgrades")
+                {
+                    if (item.target.StartsWith("UPGRADE_PART_"))
+                    {
+                        var part = int.Parse(item.target.Substring("UPGRADE_PART_".Length));
+                        buttonRect.anchoredPosition = new Vector2(part % 2 == 0 ? -390f : 390f, 25f - (part / 2) * 98f);
+                        buttonRect.sizeDelta = new Vector2(620f, 70f);
+                    }
+                    else buttonRect.anchoredPosition = new Vector2(0f, item.target == "garage" ? -390f : -472f);
+                }
                 buttonObject.GetComponent<Image>().color = new Color(0.05f, 0.67f, 0.95f, 1f);
                 if (item.target == "09_DriveTest")
                 {
                     buttonObject.AddComponent<DriveSceneLaunchButton>();
                 }
-                else if (item.target == "UPGRADE_ENGINE")
+                else if (item.target.StartsWith("UPGRADE_PART_"))
                 {
-                    buttonObject.AddComponent<UpgradePurchaseButton>();
+                    var upgrade = buttonObject.AddComponent<UpgradePurchaseButton>();
+                    var upgradeSerialized = new SerializedObject(upgrade);
+                    upgradeSerialized.FindProperty("partIndex").intValue = int.Parse(item.target.Substring("UPGRADE_PART_".Length));
+                    upgradeSerialized.ApplyModifiedPropertiesWithoutUndo();
                 }
                 else if (id == "rewards" && item.label == "CLAIM")
                 {

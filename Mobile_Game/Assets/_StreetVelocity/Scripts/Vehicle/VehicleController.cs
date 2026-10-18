@@ -52,6 +52,17 @@ namespace StreetVelocity.Vehicle
                 config.maxSpeed *= speed;
                 config.acceleration *= acceleration;
                 config.steeringDegreesPerSecond *= steering;
+                config.maxSpeed *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(3) - 1) * 0.025f;
+                config.acceleration *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(1) - 1) * 0.035f
+                    + Mathf.Max(0, PlayerCareerSave.PartLevel(2) - 1) * 0.025f
+                    + Mathf.Max(0, PlayerCareerSave.PartLevel(3) - 1) * 0.02f;
+                config.braking *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(5) - 1) * 0.06f;
+                config.lateralGrip *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(4) - 1) * 0.05f
+                    + Mathf.Max(0, PlayerCareerSave.PartLevel(6) - 1) * 0.025f;
+                config.handbrakeGrip *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(4) - 1) * 0.035f;
+                config.steeringDegreesPerSecond *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(6) - 1) * 0.03f;
+                config.nitroCapacitySeconds += Mathf.Max(0, PlayerCareerSave.PartLevel(7) - 1) * 0.35f;
+                config.nitroAcceleration *= 1f + Mathf.Max(0, PlayerCareerSave.PartLevel(7) - 1) * 0.08f;
             }
 
             if (ColorUtility.TryParseHtmlString(PlayerCareerSave.SelectedPaint, out var paint))

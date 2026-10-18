@@ -47,6 +47,13 @@ namespace StreetVelocity.Progression
         public static float ControlSensitivity => Mathf.Clamp(PlayerPrefs.GetInt(ControlSensitivityKey, 50), 10, 100) / 50f;
         public static bool InvertSteering => PlayerPrefs.GetInt(InvertSteeringKey, 0) == 1;
         public static int NextEngineUpgradeCost => 15000 * EngineLevel;
+        public static int PartLevel(int partIndex)
+        {
+            if (partIndex == 0) return EngineLevel;
+            return PlayerPrefs.GetInt(PartLevelKey(partIndex), 1);
+        }
+        public static int PartUpgradeCost(int partIndex) => 10000 * PartLevel(partIndex);
+        public static string PartName(int partIndex) => new[] { "ENGINE", "TURBO", "ECU", "TRANSMISSION", "TIRES", "BRAKES", "SUSPENSION", "NITRO" }[Mathf.Clamp(partIndex, 0, 7)];
         public static bool DailyRewardClaimedToday => PlayerPrefs.GetString(DailyClaimDateKey, string.Empty) == DateTime.Now.ToString("yyyy-MM-dd");
 
         public static bool TryClaimDailyReward(out int reward)
@@ -77,6 +84,22 @@ namespace StreetVelocity.Progression
             PlayerPrefs.Save();
             return true;
         }
+
+        public static bool TryUpgradePart(int partIndex, out int newLevel)
+        {
+            partIndex = Mathf.Clamp(partIndex, 0, 7);
+            var level = PartLevel(partIndex);
+            newLevel = level;
+            if (level >= 10 || Credits < PartUpgradeCost(partIndex)) return false;
+            AddCredits(-PartUpgradeCost(partIndex));
+            newLevel = level + 1;
+            if (partIndex == 0) PlayerPrefs.SetInt(EngineLevelKey, newLevel);
+            else PlayerPrefs.SetInt(PartLevelKey(partIndex), newLevel);
+            PlayerPrefs.Save();
+            return true;
+        }
+
+        private static string PartLevelKey(int partIndex) => $"StreetVelocity.Car{SelectedCar}.Part{partIndex}Level";
 
         public static void SelectCar(int index)
         {

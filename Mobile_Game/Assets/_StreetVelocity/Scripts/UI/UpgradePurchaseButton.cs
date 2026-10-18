@@ -7,6 +7,7 @@ namespace StreetVelocity.UI
     [RequireComponent(typeof(Button))]
     public sealed class UpgradePurchaseButton : MonoBehaviour
     {
+        [SerializeField, Range(0, 7)] private int partIndex;
         private Button button;
         private Text label;
 
@@ -20,9 +21,9 @@ namespace StreetVelocity.UI
 
         private void Purchase()
         {
-            if (!PlayerCareerSave.TryUpgradeEngine(out _))
+            if (!PlayerCareerSave.TryUpgradePart(partIndex, out _))
             {
-                if (label != null) label.text = $"NEED {PlayerCareerSave.NextEngineUpgradeCost:N0} CREDITS";
+                if (label != null) label.text = PlayerCareerSave.PartLevel(partIndex) >= 10 ? $"{PlayerCareerSave.PartName(partIndex)} MAX LEVEL" : $"NEED {PlayerCareerSave.PartUpgradeCost(partIndex):N0} CREDITS";
                 return;
             }
             Refresh();
@@ -30,7 +31,7 @@ namespace StreetVelocity.UI
 
         private void Refresh()
         {
-            if (label != null) label.text = $"ENGINE LV {PlayerCareerSave.EngineLevel} → {PlayerCareerSave.EngineLevel + 1} · {PlayerCareerSave.NextEngineUpgradeCost:N0} CR";
+            if (label != null) label.text = $"{PlayerCareerSave.PartName(partIndex)} LV {PlayerCareerSave.PartLevel(partIndex)} → {PlayerCareerSave.PartLevel(partIndex) + 1} · {PlayerCareerSave.PartUpgradeCost(partIndex):N0} CR";
         }
 
         private void OnDestroy()
