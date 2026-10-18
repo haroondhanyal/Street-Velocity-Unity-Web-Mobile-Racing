@@ -5,7 +5,8 @@
     const canvas = document.querySelector('.screen.active #raceCanvas');
     if (!canvas) return;
     const bounds = canvas.getBoundingClientRect();
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const qualityScale = state.quality === 'Low' ? 0.75 : state.quality === 'Medium' ? 1 : 1.25;
+    const ratio = Math.min((window.devicePixelRatio || 1) * qualityScale, 2);
     const width = bounds.width;
     const height = bounds.height;
     if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
@@ -37,7 +38,7 @@
     ctx.fill();
 
     ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(47,218,255,.72)';
+    ctx.strokeStyle = state.settings?.vfx === false ? 'rgba(93,128,150,.5)' : 'rgba(47,218,255,.72)';
     ctx.beginPath();
     ctx.moveTo(center - topHalf, horizon);
     ctx.lineTo(center - bottomHalf, height);
@@ -61,7 +62,7 @@
     const lapProgress = state.distance % lapLength;
     const checkpointDistance = lapLength / 6 - (lapProgress % (lapLength / 6));
     const gateT = 1 - checkpointDistance / 520;
-    if (gateT > 0 && gateT < 0.96) {
+    if (gateT > 0 && gateT < 0.96 && state.settings?.vfx !== false) {
       const y = horizon + (height - horizon) * gateT * gateT;
       const half = topHalf + (bottomHalf - topHalf) * gateT;
       const postH = 12 + gateT * 42;
@@ -96,14 +97,34 @@
       const carWidth = Math.min(width * 0.27, 290);
       const carHeight = carWidth * 0.67;
       const x = center + state.lane * width * 0.2;
+      if (state.settings?.shadows !== false) { ctx.save(); ctx.shadowColor = '#000'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 12; }
       ctx.drawImage(car, x - carWidth / 2, height - carHeight * 0.93, carWidth, carHeight);
+      if (state.settings?.shadows !== false) ctx.restore();
     }
 
-    const glow = ctx.createLinearGradient(0, horizon, 0, height);
-    glow.addColorStop(0, 'rgba(0,206,255,0)');
-    glow.addColorStop(1, 'rgba(0,206,255,.12)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, horizon, width, height - horizon);
+    if (state.settings?.postProcessing !== false) {
+      const glow = ctx.createLinearGradient(0, horizon, 0, height);
+      glow.addColorStop(0, 'rgba(0,206,255,0)');
+      glow.addColorStop(1, state.weather === 'Clear (Day)' ? 'rgba(255,197,91,.08)' : 'rgba(0,206,255,.12)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, horizon, width, height - horizon);
+    }
+    if (state.weather === 'Rain' || state.weather === 'Fog') {
+      ctx.save();
+      if (state.weather === 'Fog') {
+        const fog = ctx.createLinearGradient(0, horizon, 0, height);
+        fog.addColorStop(0, 'rgba(185,210,224,.24)'); fog.addColorStop(1, 'rgba(185,210,224,.03)');
+        ctx.fillStyle = fog; ctx.fillRect(0, horizon, width, height - horizon);
+      } else {
+        ctx.strokeStyle = 'rgba(165,220,255,.25)'; ctx.lineWidth = 1;
+        for (let i = 0; i < 55; i++) {
+          const x = (i * 97 + now * 0.23) % width;
+          const y = (i * 53 + now * 0.55) % height;
+          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 5, y + 15); ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
     void now;
   };
 })();
