@@ -76,7 +76,9 @@ namespace StreetVelocity.EditorTools
 
         private static void CreateMenuScene()
         {
-            if (AssetDatabase.LoadAssetAtPath<SceneAsset>($"{SceneFolder}/01_MainMenu.unity") != null) return;
+            // Rebuild the generated menu so screen, art, and selection updates reach existing Unity projects.
+            var menuScenePath = $"{SceneFolder}/01_MainMenu.unity";
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(menuScenePath) != null) AssetDatabase.DeleteAsset(menuScenePath);
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             CreateCamera();
             var canvasObject = new GameObject("MainCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -136,7 +138,7 @@ namespace StreetVelocity.EditorTools
             CreatePanel<CareerMapScreen>(canvas.transform, router, "worlds", "GAME WORLD ENVIRONMENTS", "Downtown · Industrial Zone · Harbor · Mountain Pass", panels,
                 new[] { ("CAREER MAP", "career"), ("BACK TO HOME", "home") });
             ConfigureRouter(router, panels.ToArray(), "splash");
-            EditorSceneManager.SaveScene(scene, $"{SceneFolder}/01_MainMenu.unity");
+            EditorSceneManager.SaveScene(scene, menuScenePath);
         }
 
         private static void CreatePanel<T>(Transform parent, ScreenRouter router, string id, string heading, string subtitle,
@@ -182,6 +184,28 @@ namespace StreetVelocity.EditorTools
                 }
             }
             AddScreenContent(panel.transform, id);
+            if (id == "home")
+            {
+                var careerCard = panel.transform.Find("CAREER REP Card");
+                var dailyCard = panel.transform.Find("DAILY REWARD Card");
+                var overview = panel.AddComponent<CareerOverviewController>();
+                var overviewSerialized = new SerializedObject(overview);
+                overviewSerialized.FindProperty("careerSummary").objectReferenceValue = careerCard.GetComponentsInChildren<Text>(true)[1];
+                overviewSerialized.FindProperty("dailySummary").objectReferenceValue = dailyCard.GetComponentsInChildren<Text>(true)[1];
+                overviewSerialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+            if (id == "achievements")
+            {
+                var victory = panel.transform.Find("FIRST VICTORY Card");
+                var drift = panel.transform.Find("DRIFT KING Card");
+                var speed = panel.transform.Find("SPEED DEMON Card");
+                var achievements = panel.AddComponent<CareerAchievementController>();
+                var achievementSerialized = new SerializedObject(achievements);
+                achievementSerialized.FindProperty("victoryText").objectReferenceValue = victory.GetComponentsInChildren<Text>(true)[1];
+                achievementSerialized.FindProperty("driftText").objectReferenceValue = drift.GetComponentsInChildren<Text>(true)[1];
+                achievementSerialized.FindProperty("speedText").objectReferenceValue = speed.GetComponentsInChildren<Text>(true)[1];
+                achievementSerialized.ApplyModifiedPropertiesWithoutUndo();
+            }
             AddText(panel.transform, heading, 56, new Vector2(0, 235), new Vector2(900, 100), FontStyle.Bold);
             AddText(panel.transform, subtitle, 24, new Vector2(0, 145), new Vector2(950, 60), FontStyle.Normal);
             var y = -300f;
@@ -221,11 +245,56 @@ namespace StreetVelocity.EditorTools
 
         private static void AddScreenContent(Transform panel, string id)
         {
+            if (id == "cars")
+            {
+                CreateOptionCards(panel, CareerOptionType.Car,
+                    new[] { "FALCON R · CLASS B", "VORTEX GT · CLASS A", "SPECTER RS · DRIFT", "TITAN XR · MUSCLE", "NOVA X · CLASS S" },
+                    new[] { "Balanced street coupe", "High speed sport coupe", "Precision drift setup", "Heavy launch power", "Top tier hyper car" });
+                return;
+            }
+            if (id == "events")
+            {
+                CreateOptionCards(panel, CareerOptionType.Event,
+                    new[] { "STREET SPRINT", "CIRCUIT RACE", "DRIFT EVENT", "TIME TRIAL", "POLICE ESCAPE" },
+                    new[] { "1 lap · 8,000 CR · 1,200 XP", "3 laps · 12,000 CR · 1,800 XP", "3,000 drift pts · 9,500 CR", "Beat 15 sec · 7,500 CR", "Escape route · 14,000 CR" });
+                return;
+            }
+            if (id == "controls")
+            {
+                CreateOptionCards(panel, CareerOptionType.Control,
+                    new[] { "TOUCH BUTTONS", "STEERING WHEEL", "TILT STEERING" },
+                    new[] { "On-screen directional controls", "Use the on-screen steering controls", "Steer by tilting your phone" });
+                CreateControlPreference(panel, ControlPreferenceAction.ToggleInvert, new Vector2(0.34f, 0.5f));
+                CreateControlPreference(panel, ControlPreferenceAction.CycleSensitivity, new Vector2(0.66f, 0.5f));
+                return;
+            }
+            if (id == "settings")
+            {
+                CreateOptionCards(panel, CareerOptionType.Graphics,
+                    new[] { "LOW GRAPHICS", "MEDIUM GRAPHICS", "HIGH GRAPHICS" },
+                    new[] { "Battery-friendly detail", "Balanced visual quality", "Full visual quality" });
+                return;
+            }
+            if (id == "weather")
+            {
+                CreateOptionCards(panel, CareerOptionType.Weather,
+                    new[] { "CLEAR DAY", "NIGHT", "RAIN", "FOG" },
+                    new[] { "Bright sky and dry road", "Neon night lighting", "Wet road and rain", "Reduced visibility" });
+                return;
+            }
+            if (id == "customize")
+            {
+                CreateOptionCards(panel, CareerOptionType.Paint,
+                    new[] { "NEON RED", "ELECTRIC BLUE", "CYAN", "GOLD", "PEARL WHITE" },
+                    new[] { "#D91E45", "#087EFF", "#21D5FF", "#F5B72A", "#F0F2F6" });
+                return;
+            }
+
             string[] titles;
             string[] details;
             switch (id)
             {
-                case "home": titles = new[] { "CAREER REP", "DAILY REWARD" }; details = new[] { "LEVEL 15  ·  8 RACE WINS", "3 DAY STREAK  ·  CLAIM 2,000 CR" }; break;
+                case "home": titles = new[] { "CAREER REP", "DAILY REWARD" }; details = new[] { "PROFILE_CAREER", "PROFILE_DAILY" }; break;
                 case "career": titles = new[] { "DOWNTOWN", "INDUSTRIAL ZONE", "HARBOR" }; details = new[] { "6 / 10 EVENTS  ·  ★★★", "5 / 10 EVENTS  ·  ★★☆", "3 / 10 EVENTS  ·  ★★☆" }; break;
                 case "events": titles = new[] { "STREET SPRINT", "CIRCUIT RACE", "DRIFT EVENT" }; details = new[] { "5.8 KM  ·  REWARD 8,000 CR", "3 LAPS  ·  REWARD 12,000 CR", "STYLE SCORE  ·  REWARD 9,500 CR" }; break;
                 case "cars": titles = new[] { "TOP SPEED", "ACCELERATION", "HANDLING" }; details = new[] { "320 KM/H  ·  CLASS B", "280 / 400", "260 / 400" }; break;
@@ -240,7 +309,7 @@ namespace StreetVelocity.EditorTools
                 case "traffic": titles = new[] { "CITY TRAFFIC", "ROAD HAZARD", "NEAR MISS BONUS" }; details = new[] { "MEDIUM DENSITY", "BOX TRUCK  ·  RIGHT LANE", "+250 XP PER CLOSE PASS" }; break;
                 case "results": titles = new[] { "RACE TIME", "BEST LAP", "REWARD" }; details = new[] { "02:18.463", "01:05.230", "12,000 CR  ·  1,800 XP" }; break;
                 case "rewards": titles = new[] { "DAY 1", "DAY 2", "DAY 3 · READY" }; details = new[] { "1,000 CREDITS", "2,000 CREDITS", "CAR PART DROP" }; break;
-                case "achievements": titles = new[] { "FIRST VICTORY", "DRIFT KING", "SPEED DEMON" }; details = new[] { "RACE WIN  ✓", "50,000 / 50,000 PTS  ✓", "300 / 300 KM/H  ✓" }; break;
+                case "achievements": titles = new[] { "FIRST VICTORY", "DRIFT KING", "SPEED DEMON" }; details = new[] { "ACHIEVEMENT_VICTORY", "ACHIEVEMENT_DRIFT", "ACHIEVEMENT_SPEED" }; break;
                 case "settings": titles = new[] { "GRAPHICS", "AUDIO", "GAMEPLAY" }; details = new[] { "HIGH  ·  60 FPS", "MUSIC 70%  ·  SFX 85%", "LANGUAGE EN  ·  VIBRATION ON" }; break;
                 case "controls": titles = new[] { "TOUCH BUTTONS", "STEERING WHEEL", "TILT CONTROL" }; details = new[] { "LEFT / RIGHT  ·  THROTTLE", "SENSITIVITY 50%", "DEVICE MOTION" }; break;
                 case "minimap": titles = new[] { "PLAYER", "CHECKPOINT 3", "FINISH" }; details = new[] { "YOU ARE HERE", "1.2 KM AHEAD", "4.4 KM TO GO" }; break;
@@ -260,6 +329,48 @@ namespace StreetVelocity.EditorTools
                 var detail = carScreen && i == 1 && details.Length == 3 ? details[1] + "  ·  " + details[2] : details[i];
                 CreateInfoCard(panel, heading, detail, new Vector2(x, -75f), new Vector2(carScreen ? 310f : 380f, 158f));
             }
+        }
+
+        private static void CreateOptionCards(Transform parent, CareerOptionType optionType, string[] labels, string[] details)
+        {
+            var startX = labels.Length == 3 ? -340f : labels.Length == 4 ? -510f : -680f;
+            const float gap = 340f;
+            for (var i = 0; i < labels.Length; i++)
+            {
+                var card = new GameObject(labels[i] + " Option", typeof(RectTransform), typeof(Image), typeof(Button), typeof(CareerOptionButton));
+                card.transform.SetParent(parent, false);
+                var rect = card.GetComponent<RectTransform>();
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(310f, 172f);
+                rect.anchoredPosition = new Vector2(startX + i * gap, -76f);
+                card.GetComponent<Image>().color = new Color(0.025f, 0.085f, 0.14f, 0.96f);
+                var detail = optionType == CareerOptionType.Paint ? "BODY COLOR  " + details[i] : details[i];
+                AddText(card.transform, labels[i], 20, new Vector2(0f, 34f), new Vector2(292f, 64f), FontStyle.Bold);
+                AddText(card.transform, detail, 16, new Vector2(0f, -35f), new Vector2(292f, 64f), FontStyle.Normal);
+
+                var serialized = new SerializedObject(card.GetComponent<CareerOptionButton>());
+                serialized.FindProperty("optionType").enumValueIndex = (int)optionType;
+                serialized.FindProperty("optionIndex").intValue = i;
+                serialized.FindProperty("optionLabel").stringValue = labels[i];
+                if (optionType == CareerOptionType.Paint) serialized.FindProperty("paintHex").stringValue = details[i];
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static void CreateControlPreference(Transform parent, ControlPreferenceAction action, Vector2 anchor)
+        {
+            var button = new GameObject("Control Preference", typeof(RectTransform), typeof(Image), typeof(Button), typeof(ControlPreferenceButton));
+            button.transform.SetParent(parent, false);
+            var rect = button.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = anchor;
+            rect.sizeDelta = new Vector2(390f, 58f);
+            rect.anchoredPosition = new Vector2(0f, -215f);
+            button.GetComponent<Image>().color = new Color(0.025f, 0.085f, 0.14f, 0.96f);
+            var preference = new SerializedObject(button.GetComponent<ControlPreferenceButton>());
+            preference.FindProperty("action").enumValueIndex = (int)action;
+            preference.ApplyModifiedPropertiesWithoutUndo();
+            var label = action == ControlPreferenceAction.ToggleInvert ? "INVERT STEERING" : "SENSITIVITY";
+            AddText(button.transform, label, 17, Vector2.zero, new Vector2(370f, 52f), FontStyle.Bold);
         }
 
         private static void CreateInfoCard(Transform parent, string heading, string detail, Vector2 position, Vector2 size)

@@ -13,6 +13,8 @@ namespace StreetVelocity.Vehicle
         private IVehicleInput input;
         private float nitroSeconds;
         private bool drivingEnabled = true;
+        public float DriftScore { get; private set; }
+        public float HighestSpeedKmh { get; private set; }
 
         public float SpeedKmh => body == null ? 0f : body.velocity.magnitude * 3.6f;
         public float Nitro01 => config == null || config.nitroCapacitySeconds <= 0f ? 0f : nitroSeconds / config.nitroCapacitySeconds;
@@ -26,6 +28,30 @@ namespace StreetVelocity.Vehicle
             body.centerOfMass = new Vector3(0f, -0.35f, 0f);
             if (config == null) Debug.LogError("VehicleConfig is missing.", this);
             if (input == null) Debug.LogError("Input source must implement IVehicleInput.", this);
+            ApplySelectedCarAndPaint();
+        }
+
+        public void ResetDriftScore() => DriftScore = 0f;
+
+        private void ApplySelectedCarAndPaint()
+        {
+            var car = PlayerCareerSave.SelectedCar;
+            var speed = new[] { 1f, 1.12f, 1.02f, 0.96f, 1.22f }[car];
+            var acceleration = new[] { 1f, 1.08f, 1.02f, 1.14f, 1.2f }[car];
+            var steering = new[] { 1f, 0.95f, 1.18f, 0.82f, 1.04f }[car];
+            if (config != null)
+            {
+                config = Instantiate(config);
+                config.maxSpeed *= speed;
+                config.acceleration *= acceleration;
+                config.steeringDegreesPerSecond *= steering;
+            }
+
+            if (ColorUtility.TryParseHtmlString(PlayerCareerSave.SelectedPaint, out var paint))
+            {
+                var bodyRenderer = transform.Find("Coupe Body")?.GetComponent<Renderer>();
+                if (bodyRenderer != null) bodyRenderer.material.color = paint;
+            }
         }
 
         public void SetDrivingEnabled(bool enabled)
@@ -42,6 +68,7 @@ namespace StreetVelocity.Vehicle
         {
             if (!drivingEnabled || config == null || input == null) return;
             var forwardSpeed = Vector3.Dot(body.velocity, transform.forward);
+            HighestSpeedKmh = Mathf.Max(HighestSpeedKmh, SpeedKmh);
             var throttle = input.Throttle;
             var engineScale = 1f + Mathf.Max(0, PlayerCareerSave.EngineLevel - 1) * 0.035f;
             var boosting = input.Nitro && nitroSeconds > 0f;
@@ -62,6 +89,8 @@ namespace StreetVelocity.Vehicle
             }
 
             var speedFactor = Mathf.Clamp01(body.velocity.magnitude / 4f);
+            if (input.Handbrake && speedFactor > 0.25f && Mathf.Abs(input.Steering) > 0.15f)
+                DriftScore += body.velocity.magnitude * 3.6f * Mathf.Abs(input.Steering) * Time.fixedDeltaTime;
             var turn = input.Steering * config.steeringDegreesPerSecond * speedFactor * Time.fixedDeltaTime;
             if (input.Handbrake) turn *= 1.55f;
             body.MoveRotation(body.rotation * Quaternion.Euler(0f, turn, 0f));

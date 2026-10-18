@@ -24,6 +24,7 @@ namespace StreetVelocity.UI
             {
                 if (label != null) label.text = $"CLAIMED · {credits:N0} CR";
                 button.interactable = false;
+                FindObjectOfType<CareerOverviewController>()?.Refresh();
             }
             else Refresh();
         }

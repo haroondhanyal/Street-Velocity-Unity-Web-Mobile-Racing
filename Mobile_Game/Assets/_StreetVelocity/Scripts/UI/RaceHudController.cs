@@ -55,6 +55,8 @@ namespace StreetVelocity.UI
                 var seconds = raceManager.ElapsedSeconds;
                 timerText.text = $"{Mathf.FloorToInt(seconds / 60f):00}:{Mathf.FloorToInt(seconds % 60f):00}.{Mathf.FloorToInt((seconds % 1f) * 1000f):000}";
             }
+            if (raceManager != null && raceManager.IsDriftEvent && checkpointText != null && vehicle != null)
+                checkpointText.text = $"DRIFT SCORE  {Mathf.FloorToInt(vehicle.DriftScore):N0} / {raceManager.DriftTarget:N0}";
             if (countdownClearTimer > 0f)
             {
                 countdownClearTimer -= Time.deltaTime;
@@ -73,7 +75,7 @@ namespace StreetVelocity.UI
         private void UpdateProgress(int lap, int nextCheckpoint)
         {
             if (raceManager == null || raceManager.Definition == null) return;
-            if (lapText != null) lapText.text = $"LAP {lap} / {raceManager.Definition.laps}";
+            if (lapText != null) lapText.text = $"LAP {lap} / {raceManager.LapCount}";
             if (checkpointText != null) checkpointText.text = $"CHECKPOINT {nextCheckpoint + 1} / {raceManager.CheckpointsPerLap}";
         }
 
@@ -81,12 +83,18 @@ namespace StreetVelocity.UI
         {
             if (rewardGranted || raceManager == null || raceManager.Definition == null) return;
             rewardGranted = true;
-            PlayerCareerSave.RecordRace(time, raceManager.Definition.creditsReward, raceManager.Definition.xpReward);
-            if (resultTitle != null) resultTitle.text = "RACE COMPLETE · 1ST PLACE";
+            var position = raceManager.FinishPosition;
+            var won = position == 1;
+            var credits = won ? raceManager.CreditsReward : Mathf.RoundToInt(raceManager.CreditsReward * 0.55f);
+            var xp = won ? raceManager.ExperienceReward : Mathf.RoundToInt(raceManager.ExperienceReward * 0.75f);
+            PlayerCareerSave.RecordRace(time, credits, xp, won, vehicle != null ? vehicle.DriftScore : 0f,
+                vehicle != null ? vehicle.HighestSpeedKmh : 0f, raceManager.EventIndex);
+            if (resultTitle != null) resultTitle.text = $"{raceManager.EventName} · {(won ? "1ST PLACE" : "TIME TARGET MISSED")}";
             if (resultSummary != null)
             {
                 var best = PlayerCareerSave.BestTime;
-                resultSummary.text = $"TIME  {FormatTime(time)}\nBEST  {FormatTime(best)}\nREWARD  {raceManager.Definition.creditsReward:N0} CREDITS  ·  {raceManager.Definition.xpReward:N0} XP\nLEVEL  {PlayerCareerSave.Level}  ·  WALLET  {PlayerCareerSave.Credits:N0}";
+                var target = raceManager.IsTimeTrial ? "TARGET  00:15.000\n" : raceManager.IsDriftEvent ? $"DRIFT SCORE  {raceManager.DriftTarget:N0}+\n" : string.Empty;
+                resultSummary.text = $"{target}TIME  {FormatTime(time)}\nBEST  {FormatTime(best)}\nREWARD  {credits:N0} CREDITS  ·  {xp:N0} XP\nLEVEL  {PlayerCareerSave.Level}  ·  WALLET  {PlayerCareerSave.Credits:N0}";
             }
             if (finishPanel != null) finishPanel.SetActive(true);
             if (finishPanel != null) finishPanel.transform.SetAsLastSibling();

@@ -65,18 +65,19 @@ namespace StreetVelocity.EditorTools
         private static void CreateStreet()
         {
             var environment = new GameObject("Neon City Driving Test");
+            environment.AddComponent<RaceEnvironmentController>();
             var ground = Material("Wet Asphalt", new Color(0.025f, 0.045f, 0.075f), 0.3f);
             var asphalt = Material("Road Asphalt", new Color(0.055f, 0.07f, 0.095f), 0.45f);
             var cyan = Material("Neon Cyan", new Color(0.02f, 0.55f, 0.8f), 0.25f, new Color(0.05f, 0.9f, 1f));
             var pink = Material("Neon Magenta", new Color(0.7f, 0.03f, 0.22f), 0.2f, new Color(1f, 0.035f, 0.24f));
             var lane = Material("Road Markings", new Color(0.55f, 0.68f, 0.78f), 0.05f, new Color(0.15f, 0.28f, 0.34f));
-            Cube("City Floor", new Vector3(0f, -0.65f, 300f), new Vector3(280f, 0.5f, 850f), ground, environment.transform);
-            Cube("Main Street", new Vector3(0f, -0.18f, 330f), new Vector3(19f, 0.25f, 760f), asphalt, environment.transform);
-            Cube("Left Neon Curb", new Vector3(-9.65f, 0.02f, 330f), new Vector3(0.18f, 0.22f, 760f), cyan, environment.transform);
-            Cube("Right Neon Curb", new Vector3(9.65f, 0.02f, 330f), new Vector3(0.18f, 0.22f, 760f), pink, environment.transform);
-            Cube("Left Safety Barrier", new Vector3(-10.7f, 0.55f, 330f), new Vector3(0.4f, 1.2f, 760f), ground, environment.transform);
-            Cube("Right Safety Barrier", new Vector3(10.7f, 0.55f, 330f), new Vector3(0.4f, 1.2f, 760f), ground, environment.transform);
-            for (var z = 8f; z < 700f; z += 17f)
+            Cube("City Floor", new Vector3(0f, -0.65f, 1100f), new Vector3(280f, 0.5f, 2250f), ground, environment.transform);
+            Cube("Main Street", new Vector3(0f, -0.18f, 1100f), new Vector3(19f, 0.25f, 2220f), asphalt, environment.transform);
+            Cube("Left Neon Curb", new Vector3(-9.65f, 0.02f, 1100f), new Vector3(0.18f, 0.22f, 2220f), cyan, environment.transform);
+            Cube("Right Neon Curb", new Vector3(9.65f, 0.02f, 1100f), new Vector3(0.18f, 0.22f, 2220f), pink, environment.transform);
+            Cube("Left Safety Barrier", new Vector3(-10.7f, 0.55f, 1100f), new Vector3(0.4f, 1.2f, 2220f), ground, environment.transform);
+            Cube("Right Safety Barrier", new Vector3(10.7f, 0.55f, 1100f), new Vector3(0.4f, 1.2f, 2220f), ground, environment.transform);
+            for (var z = 8f; z < 2200f; z += 17f)
             {
                 Cube("Lane Dash", new Vector3(0f, -0.045f, z), new Vector3(0.18f, 0.03f, 7.5f), lane, environment.transform);
                 BuildSideBlock(z, -1, environment.transform, cyan, pink);
@@ -205,9 +206,9 @@ namespace StreetVelocity.EditorTools
 
             var cyan = Material("Checkpoint Cyan", new Color(0.02f, 0.55f, 0.8f), 0.25f, new Color(0.05f, 0.9f, 1f));
             var pink = Material("Checkpoint Magenta", new Color(0.7f, 0.03f, 0.22f), 0.2f, new Color(1f, 0.035f, 0.24f));
-            var checkpoints = new[] { 145f, 305f, 465f, 625f };
-            for (var i = 0; i < checkpoints.Length; i++)
-                CreateCheckpoint(i, checkpoints[i], manager, cyan, pink);
+            for (var lap = 0; lap < 3; lap++)
+            for (var order = 0; order < 4; order++)
+                CreateCheckpoint(order, 145f + lap * 700f + order * 160f, manager, cyan, pink);
             return manager;
         }
 
@@ -289,12 +290,14 @@ namespace StreetVelocity.EditorTools
             hudSerialized.FindProperty("drivingControlsRoot").objectReferenceValue = controlsRoot;
             hudSerialized.ApplyModifiedPropertiesWithoutUndo();
 
-            CreateDriveButton(controlsRoot.transform, input, "STEER LEFT", "◀", MobileDriveButton.DriveAction.SteerLeft, new Vector2(0.07f, 0.16f), new Vector2(132f, 132f));
-            CreateDriveButton(controlsRoot.transform, input, "STEER RIGHT", "▶", MobileDriveButton.DriveAction.SteerRight, new Vector2(0.20f, 0.16f), new Vector2(132f, 132f));
+            var steerLeft = CreateDriveButton(controlsRoot.transform, input, "STEER LEFT", "◀", MobileDriveButton.DriveAction.SteerLeft, new Vector2(0.07f, 0.16f), new Vector2(132f, 132f));
+            var steerRight = CreateDriveButton(controlsRoot.transform, input, "STEER RIGHT", "▶", MobileDriveButton.DriveAction.SteerRight, new Vector2(0.20f, 0.16f), new Vector2(132f, 132f));
             CreateDriveButton(controlsRoot.transform, input, "BRAKE", "BRAKE", MobileDriveButton.DriveAction.Brake, new Vector2(0.75f, 0.15f), new Vector2(150f, 100f));
             CreateDriveButton(controlsRoot.transform, input, "THROTTLE", "GO", MobileDriveButton.DriveAction.Throttle, new Vector2(0.88f, 0.16f), new Vector2(150f, 116f));
             CreateDriveButton(controlsRoot.transform, input, "HANDBRAKE", "DRIFT", MobileDriveButton.DriveAction.Handbrake, new Vector2(0.73f, 0.30f), new Vector2(128f, 78f));
             CreateDriveButton(controlsRoot.transform, input, "NITRO", "N₂O", MobileDriveButton.DriveAction.Nitro, new Vector2(0.88f, 0.31f), new Vector2(128f, 78f));
+            var wheel = CreateSteeringWheel(controlsRoot.transform, input);
+            controlsRoot.AddComponent<MobileControlLayout>().Configure(steerLeft, steerRight, wheel);
         }
 
         private static GameObject CreateFinishPanel(Transform parent, out Text title, out Text summary, out Button retry, out Button garage)
@@ -327,7 +330,7 @@ namespace StreetVelocity.EditorTools
             return obj.GetComponent<Button>();
         }
 
-        private static void CreateDriveButton(Transform parent, MobileVehicleInput input, string name, string label,
+        private static GameObject CreateDriveButton(Transform parent, MobileVehicleInput input, string name, string label,
             MobileDriveButton.DriveAction action, Vector2 anchor, Vector2 size)
         {
             var obj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(MobileDriveButton));
@@ -342,6 +345,21 @@ namespace StreetVelocity.EditorTools
             serialized.FindProperty("action").enumValueIndex = (int)action;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             MakeText(obj.transform, name + " Label", label, 28, new Vector2(0.5f, 0.5f), new Vector2(size.x - 10f, size.y - 10f), TextAnchor.MiddleCenter);
+            return obj;
+        }
+
+        private static GameObject CreateSteeringWheel(Transform parent, MobileVehicleInput input)
+        {
+            var wheel = new GameObject("Touch Steering Wheel", typeof(RectTransform), typeof(Image), typeof(MobileSteeringWheel));
+            wheel.transform.SetParent(parent, false);
+            var rect = wheel.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = new Vector2(0.16f, 0.18f);
+            rect.sizeDelta = new Vector2(190f, 190f);
+            wheel.GetComponent<Image>().color = new Color(0.04f, 0.18f, 0.28f, 0.88f);
+            var text = MakeText(wheel.transform, "Steering Wheel Mark", "◉", 104, new Vector2(0.5f, 0.5f), new Vector2(175f, 175f), TextAnchor.MiddleCenter);
+            text.raycastTarget = false;
+            wheel.GetComponent<MobileSteeringWheel>().Configure(input);
+            return wheel;
         }
 
         private static void CreateMenuButton(Transform parent)
