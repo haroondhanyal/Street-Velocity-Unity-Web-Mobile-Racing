@@ -4,3 +4,5 @@
 .race-countdown{position:absolute;z-index:4;left:50%;top:47%;transform:translate(-50%,-50%);font:900 clamp(90px,18vw,190px)/.8 var(--display);font-style:italic;color:#fff;text-shadow:0 5px 0 #12426a,0 0 40px #20d9ff;pointer-events:none}
 @media(max-width:680px){.car-render{width:92%;max-height:74%}.car-stage>.car-render{margin:50px 0 0 9%}.mini-car .car-render{height:70px}.preview-car .car-render{width:100%}.race-player-car{width:clamp(130px,38vw,205px);bottom:11%}.drive-controls{gap:5px}.drive-control{width:46px;height:46px;font-size:17px}.hud-bottom{position:relative}.race-hud{inset:10px}.race-world{background-position:60% center}}
 @media(max-width:680px){.steer-controls{gap:5px}.control-btn{width:42px;height:42px;font-size:24px}.drive-controls{gap:4px}.drive-control{width:38px;height:38px;font-size:15px}.speedometer{width:82px;height:82px}.speedometer b{font-size:24px}.nitro-control{width:50px;height:50px;font-size:18px}}
+.race-wheel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:106px;height:106px;border-width:9px;background:#06101dc9;touch-action:none;user-select:none;cursor:grab;z-index:5}
+.race-wheel:active{cursor:grabbing}
