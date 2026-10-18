@@ -1,6 +1,6 @@
 # Street Velocity — Web Racing Game
 
-Street Velocity is a neon night street racing game for desktop browsers and phone screens. Phase 1 builds the reference-inspired screens and career flow; Phase 2 adds arcade driving with keyboard and touch controls; Phase 3 adds five race formats: rival sprint/circuit, drift scoring, a 28-second time trial, police pursuit with a bust outcome, and traffic hazards with collision-based payout penalties. Results award placement-based credits and XP, with daily rewards, engine upgrades, weather effects, and saved progression. Desktop and phone layouts use separate responsive styling.
+Street Velocity is a neon night racer with separate responsive web and landscape Android/iOS editions. Phases 1–4 include 22 reference-inspired screens, career and garage flows, mobile touch/wheel/tilt controls, five race events, rewards and local progression, eight purchasable performance parts per car, and prototype traffic, rivals, and police actors. The browser edition also has its own race rendering with drift scoring and time trial targets.
 
 ## Screenshots
 
