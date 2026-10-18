@@ -35,6 +35,9 @@ namespace StreetVelocity.EditorTools
             CreateStreet();
             var mobileInput = CreateVehicle(config, out var vehicle, out var cameraFollow);
             var raceManager = CreateRaceSystem(vehicle);
+            var raceActors = new GameObject("Race Actors").AddComponent<RaceActorsController>();
+            raceActors.transform.SetParent(GameObject.Find("Neon City Driving Test").transform, false);
+            raceActors.Configure(raceManager, vehicle);
             CreateHud(vehicle, mobileInput, raceManager);
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddBuildScene(ScenePath);

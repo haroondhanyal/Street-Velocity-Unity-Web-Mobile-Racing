@@ -33,6 +33,13 @@ namespace StreetVelocity.Vehicle
 
         public void ResetDriftScore() => DriftScore = 0f;
 
+        public void ApplyImpact(float speedLoss = 0.4f)
+        {
+            if (body == null) return;
+            body.velocity *= 1f - Mathf.Clamp01(speedLoss);
+            body.AddForce(transform.right * Random.Range(-2.5f, 2.5f), ForceMode.Impulse);
+        }
+
         private void ApplySelectedCarAndPaint()
         {
             var car = PlayerCareerSave.SelectedCar;
