@@ -57,16 +57,37 @@
       }
     }
 
-    for (let i = 0; i < 6; i++) {
-      const t = (i * 0.2 + phase * 0.55) % 1;
+    const lapLength = state.trackLength || 1250;
+    const lapProgress = state.distance % lapLength;
+    const checkpointDistance = lapLength / 6 - (lapProgress % (lapLength / 6));
+    const gateT = 1 - checkpointDistance / 520;
+    if (gateT > 0 && gateT < 0.96) {
+      const y = horizon + (height - horizon) * gateT * gateT;
+      const half = topHalf + (bottomHalf - topHalf) * gateT;
+      const postH = 12 + gateT * 42;
+      ctx.save();
+      ctx.shadowColor = '#25dcff'; ctx.shadowBlur = 18 * gateT;
+      ctx.strokeStyle = `rgba(36,220,255,${0.35 + gateT * 0.6})`;
+      ctx.lineWidth = 1 + gateT * 5;
+      ctx.beginPath();
+      ctx.moveTo(center - half * 0.92, y); ctx.lineTo(center - half * 0.92, y - postH);
+      ctx.lineTo(center + half * 0.92, y - postH); ctx.lineTo(center + half * 0.92, y);
+      ctx.stroke(); ctx.restore();
+    }
+
+    for (const [index, opponent] of (state.opponents || []).entries()) {
+      const gap = opponent.distance - state.distance;
+      if (gap < -90 || gap > 620) continue;
+      const t = Math.max(0.06, Math.min(0.98, 1 - gap / 700));
       const y = horizon + (height - horizon) * t * t;
       const half = topHalf + (bottomHalf - topHalf) * t;
-      const x = center + [-0.56, 0.48, -0.08, 0.72, -0.76, 0.16][i] * half * 0.72;
-      const w = 3 + t * 28;
-      const h = 5 + t * 43;
+      const x = center + opponent.lane * half * 0.72;
+      const w = 5 + t * 34;
+      const h = 7 + t * 52;
+      const color = index % 2 ? '#22d9ff' : '#ff285f';
       ctx.fillStyle = '#03070d';
-      ctx.fillRect(x - w * 0.55, y - h * 0.75, w * 1.1, h);
-      ctx.fillStyle = i % 2 ? '#20d9ff' : '#ff285f';
+      ctx.fillRect(x - w * 0.55, y - h * 0.78, w * 1.1, h);
+      ctx.fillStyle = color;
       ctx.fillRect(x - w * 0.5, y - h * 0.18, w * 0.2, Math.max(2, h * 0.08));
       ctx.fillRect(x + w * 0.3, y - h * 0.18, w * 0.2, Math.max(2, h * 0.08));
     }
