@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#07101e">
+  <meta name="description" content="Street Velocity — neon nights, city racing. Play on desktop or mobile.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <title>Street Velocity</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="visuals.css">
+</head>
+<body>
+  <div class="app-shell" id="app">
+    <header class="topbar">
+      <a class="brand" href="#home" data-screen="home" aria-label="Street Velocity home"><span class="brand-mark">SV</span><span>STREET <b>VELOCITY</b></span></a>
+      <div class="profile"><div class="avatar">P</div><div class="profile-copy"><b>PLAYER01</b><small>LEVEL <span id="level">15</span> · STREET RACER</small></div><div class="xp"><i></i></div></div>
+      <div class="wallet"><span>◉ <b id="credits">125,000</b></span><span>◆ <b id="gems">320</b></span></div>
+      <button class="icon-button" data-screen="settings" aria-label="Settings">⚙</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">☰</button>
+    </header>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-label">DRIVER MENU</div>
+      <button class="nav-item active" data-screen="home"><span>⌂</span>Home</button>
+      <button class="nav-item" data-screen="career"><span>⌖</span>Career map</button>
+      <button class="nav-item" data-screen="cars"><span>▰</span>Cars</button>
+      <button class="nav-item" data-screen="garage"><span>⚒</span>Garage</button>
+      <button class="nav-item" data-screen="events"><span>♜</span>Events</button>
+      <button class="nav-item" data-screen="achievements"><span>✦</span>Achievements</button>
+      <div class="sidebar-bottom"><div class="daily-mini"><span class="daily-icon">◉</span><div><b>Daily rewards</b><small>Day 3 streak</small></div><button data-screen="rewards">›</button></div><button class="nav-item" data-screen="settings"><span>⚙</span>Settings</button></div>
+    </aside>
+    <main class="main" id="main">
+      <section class="screen active" data-page="splash" id="splash"></section>
+      <section class="screen active" data-page="home" id="home"></section>
+      <section class="screen" data-page="career" id="career"></section>
+      <section class="screen" data-page="events" id="events"></section>
+      <section class="screen" data-page="cars" id="cars"></section>
+      <section class="screen" data-page="garage" id="garage"></section>
+      <section class="screen" data-page="customize" id="customize"></section>
+      <section class="screen" data-page="upgrades" id="upgrades"></section>
+      <section class="screen" data-page="race" id="race"></section>
+      <section class="screen" data-page="race-start" id="race-start"></section>
+      <section class="screen" data-page="drift" id="drift"></section>
+      <section class="screen" data-page="nitro" id="nitro"></section>
+      <section class="screen" data-page="police" id="police"></section>
+      <section class="screen" data-page="traffic" id="traffic"></section>
+      <section class="screen" data-page="results" id="results"></section>
+      <section class="screen" data-page="rewards" id="rewards"></section>
+      <section class="screen" data-page="achievements" id="achievements"></section>
+      <section class="screen" data-page="settings" id="settings"></section>
+      <section class="screen" data-page="controls" id="controls"></section>
+      <section class="screen" data-page="minimap" id="minimap"></section>
+      <section class="screen" data-page="weather" id="weather"></section>
+      <section class="screen" data-page="worlds" id="worlds"></section>
+    </main>
+    <nav class="mobile-nav" aria-label="Quick navigation"><button data-screen="home">⌂<small>Home</small></button><button data-screen="career">⌖<small>Career</small></button><button data-screen="cars">▰<small>Cars</small></button><button data-screen="garage">⚒<small>Garage</small></button><button data-screen="settings">☷<small>More</small></button></nav>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <script src="race-render.js"></script>
+  <script src="game.js"></script>
+  <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+</body>
+</html>

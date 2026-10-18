@@ -1,0 +1,17 @@
+{
+  "name": "Street Velocity",
+  "short_name": "Street Velocity",
+  "description": "Neon nights, city racing.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#07101d",
+  "theme_color": "#07101d",
+  "icons": [{
+    "src": "assets/icon.svg",
+    "sizes": "any",
+    "type": "image/svg+xml",
+    "purpose": "any"
+  }]
+}
