@@ -17,7 +17,7 @@
 
 ## Current prototype limits
 
-- Unity's circuit stages sit along one generated straight road rather than a loop; its cars and city use generated primitive geometry. Unity police escape records a route finish but has no police pursuit AI, and there are no native rival racers or traffic simulation yet.
+- Unity's circuit stages sit along one generated straight road rather than a loop; cars and city use generated primitive geometry. Phase 4 adds moving prototype rivals, traffic, and police chasers, but the rivals do not determine finishing place and police cannot catch the player.
 - Web police mode renders flashing police-style rivals and traffic mode has passable collision hazards; neither is network multiplayer. The game uses local browser/PlayerPrefs saves with no cross-device account sync.
 - Unity Editor compilation, generated-scene review, Android/iOS builds, device input checks, audio, production 3D art, optimization, and hardware QA remain unverified or future production work.
 
@@ -25,3 +25,8 @@
 
 - Web: from the repository root run `python3 -m http.server 8000`, then open `http://localhost:8000/Web_Game/`.
 - Unity: copy `Mobile_Game/Assets/` into Unity 2022.3 LTS or newer, run **Street Velocity > Phase 1 > Setup Foundation**, then **Street Velocity > Phase 2 > Build Driving Test Scene**. See [`UNITY_SETUP_CHECKLIST.md`](UNITY_SETUP_CHECKLIST.md).
+
+## Phase 4 — Prototype world actors
+
+- **Unity mobile:** The generated race scene now spawns four moving rivals for Sprint/Circuit, moving civilian traffic for non-police events, and two pursuing police units for Police Escape. Traffic and police contact apply a speed penalty; the actors stop when the race ends.
+- **Scope:** These actors are procedural prototype cars following a single straight road. Rival finishing order, a closed-loop track, police capture/failure rules, and production vehicle models are not implemented yet. Unity Editor play mode and device builds remain unverified.
