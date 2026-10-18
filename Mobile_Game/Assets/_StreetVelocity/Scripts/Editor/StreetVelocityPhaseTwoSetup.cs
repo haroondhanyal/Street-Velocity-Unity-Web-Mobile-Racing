@@ -253,6 +253,7 @@ namespace StreetVelocity.EditorTools
             var speed = MakeText(canvas.transform, "Speed", "000", 70, new Vector2(0.88f, 0.82f), new Vector2(260f, 100f), TextAnchor.MiddleCenter);
             var gear = MakeText(canvas.transform, "Gear", "1", 28, new Vector2(0.88f, 0.72f), new Vector2(200f, 45f), TextAnchor.MiddleCenter);
             var timer = MakeText(canvas.transform, "Race Timer", "00:00.000", 27, new Vector2(0.15f, 0.93f), new Vector2(270f, 55f), TextAnchor.MiddleLeft);
+            var position = MakeText(canvas.transform, "Race Position", "POS  1 / 5", 24, new Vector2(0.15f, 0.975f), new Vector2(280f, 42f), TextAnchor.MiddleLeft);
             var lap = MakeText(canvas.transform, "Lap Progress", "LAP 1 / 1", 23, new Vector2(0.15f, 0.875f), new Vector2(270f, 42f), TextAnchor.MiddleLeft);
             var checkpoint = MakeText(canvas.transform, "Checkpoint Progress", "CHECKPOINT 1 / 4", 20, new Vector2(0.15f, 0.83f), new Vector2(310f, 40f), TextAnchor.MiddleLeft);
             MakeText(canvas.transform, "District", "NEON DISTRICT  /  DOWNTOWN", 22, new Vector2(0.5f, 0.94f), new Vector2(560f, 52f), TextAnchor.MiddleCenter);
@@ -272,6 +273,7 @@ namespace StreetVelocity.EditorTools
             hudSerialized.FindProperty("speedText").objectReferenceValue = speed;
             hudSerialized.FindProperty("gearText").objectReferenceValue = gear;
             hudSerialized.FindProperty("timerText").objectReferenceValue = timer;
+            hudSerialized.FindProperty("positionText").objectReferenceValue = position;
             hudSerialized.FindProperty("lapText").objectReferenceValue = lap;
             hudSerialized.FindProperty("checkpointText").objectReferenceValue = checkpoint;
             hudSerialized.FindProperty("nitroFill").objectReferenceValue = nitroFill;

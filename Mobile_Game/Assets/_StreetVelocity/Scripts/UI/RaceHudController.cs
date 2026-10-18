@@ -17,6 +17,7 @@ namespace StreetVelocity.UI
         [SerializeField] private Text timerText;
         [SerializeField] private Text lapText;
         [SerializeField] private Text checkpointText;
+        [SerializeField] private Text positionText;
         [SerializeField] private Text countdownText;
         [SerializeField] private Text resultTitle;
         [SerializeField] private Text resultSummary;
@@ -55,6 +56,10 @@ namespace StreetVelocity.UI
                 var seconds = raceManager.ElapsedSeconds;
                 timerText.text = $"{Mathf.FloorToInt(seconds / 60f):00}:{Mathf.FloorToInt(seconds % 60f):00}.{Mathf.FloorToInt((seconds % 1f) * 1000f):000}";
             }
+            if (raceManager != null && positionText != null)
+                positionText.text = raceManager.IsPoliceEscape
+                    ? $"HEAT  {Mathf.CeilToInt(raceManager.PolicePressure)} / 8  ·  {(raceManager.WasCaptured ? "BUSTED" : "ESCAPE")}"
+                    : $"POS  {raceManager.Position} / {(raceManager.EventIndex <= 1 ? 5 : 1)}";
             if (raceManager != null && raceManager.IsDriftEvent && checkpointText != null && vehicle != null)
                 checkpointText.text = $"DRIFT SCORE  {Mathf.FloorToInt(vehicle.DriftScore):N0} / {raceManager.DriftTarget:N0}";
             if (countdownClearTimer > 0f)
@@ -85,16 +90,21 @@ namespace StreetVelocity.UI
             rewardGranted = true;
             var position = raceManager.FinishPosition;
             var won = position == 1;
-            var credits = won ? raceManager.CreditsReward : Mathf.RoundToInt(raceManager.CreditsReward * 0.55f);
-            var xp = won ? raceManager.ExperienceReward : Mathf.RoundToInt(raceManager.ExperienceReward * 0.75f);
+            var multiplier = raceManager.WasCaptured ? 0.2f : raceManager.IsTimeTrial && !won ? 0.55f :
+                position == 1 ? 1f : position == 2 ? 0.8f : position == 3 ? 0.65f : 0.45f;
+            var credits = Mathf.RoundToInt(raceManager.CreditsReward * multiplier);
+            var xp = Mathf.RoundToInt(raceManager.ExperienceReward * (raceManager.IsTimeTrial && !won ? 0.75f : multiplier));
             PlayerCareerSave.RecordRace(time, credits, xp, won, vehicle != null ? vehicle.DriftScore : 0f,
                 vehicle != null ? vehicle.HighestSpeedKmh : 0f, raceManager.EventIndex);
-            if (resultTitle != null) resultTitle.text = $"{raceManager.EventName} · {(won ? "1ST PLACE" : "TIME TARGET MISSED")}";
+            var result = raceManager.WasCaptured ? "BUSTED" : raceManager.IsTimeTrial
+                ? won ? "TARGET BEATEN" : "TIME TARGET MISSED"
+                : $"{PlaceName(position)} PLACE";
+            if (resultTitle != null) resultTitle.text = $"{raceManager.EventName} · {result}";
             if (resultSummary != null)
             {
                 var best = PlayerCareerSave.BestTime;
                 var target = raceManager.IsTimeTrial ? "TARGET  00:15.000\n" : raceManager.IsDriftEvent ? $"DRIFT SCORE  {raceManager.DriftTarget:N0}+\n" : string.Empty;
-                resultSummary.text = $"{target}TIME  {FormatTime(time)}\nBEST  {FormatTime(best)}\nREWARD  {credits:N0} CREDITS  ·  {xp:N0} XP\nLEVEL  {PlayerCareerSave.Level}  ·  WALLET  {PlayerCareerSave.Credits:N0}";
+                resultSummary.text = $"{target}POSITION  {position}\nTIME  {FormatTime(time)}\nBEST  {FormatTime(best)}\nREWARD  {credits:N0} CREDITS  ·  {xp:N0} XP\nLEVEL  {PlayerCareerSave.Level}  ·  WALLET  {PlayerCareerSave.Credits:N0}";
             }
             if (finishPanel != null) finishPanel.SetActive(true);
             if (finishPanel != null) finishPanel.transform.SetAsLastSibling();
@@ -102,6 +112,7 @@ namespace StreetVelocity.UI
         }
 
         private static string FormatTime(float seconds) => $"{Mathf.FloorToInt(seconds / 60f):00}:{Mathf.FloorToInt(seconds % 60f):00}.{Mathf.FloorToInt((seconds % 1f) * 1000f):000}";
+        private static string PlaceName(int position) => position == 1 ? "1ST" : position == 2 ? "2ND" : position == 3 ? "3RD" : $"{position}TH";
         private static void RetryRace() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         private static void ReturnToGarage() => SceneManager.LoadScene("01_MainMenu");
 

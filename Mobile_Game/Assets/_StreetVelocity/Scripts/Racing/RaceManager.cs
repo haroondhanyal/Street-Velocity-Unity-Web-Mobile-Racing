@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using StreetVelocity.Progression;
 using StreetVelocity.Vehicle;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace StreetVelocity.Racing
     {
         [SerializeField] private RaceDefinition definition;
         [SerializeField] private VehicleController vehicle;
+        private readonly Dictionary<RaceActor, float> rivalProgress = new Dictionary<RaceActor, float>();
+        private float raceStartZ;
 
         public int CurrentLap { get; private set; } = 1;
         public int NextCheckpoint { get; private set; }
@@ -28,13 +31,41 @@ namespace StreetVelocity.Racing
         public int ExperienceReward => new[] { 1200, 1800, 1500, 900, 2200 }[EventIndex];
         public bool IsDriftEvent => EventIndex == 2;
         public bool IsTimeTrial => EventIndex == 3;
-        public int FinishPosition => IsTimeTrial && ElapsedSeconds > 15f ? 2 : 1;
+        public bool IsPoliceEscape => EventIndex == 4;
+        public bool WasCaptured { get; private set; }
+        public float PolicePressure { get; private set; }
+        public float PlayerProgress => vehicle != null ? vehicle.transform.position.z - raceStartZ : 0f;
+        public int FinishPosition { get; private set; } = 1;
+        public int Position => IsPoliceEscape ? (WasCaptured ? 6 : 1) : IsTimeTrial ? (ElapsedSeconds > 15f ? 2 : 1) : 1 + CountRivalsAhead();
         public float DriftTarget => 3000f;
 
         public event Action<int, int> ProgressChanged;
         public event Action<float> Finished;
         public event Action<float> CountdownChanged;
         public event Action RaceStarted;
+
+        public void RegisterRival(RaceActor actor)
+        {
+            if (actor != null && !rivalProgress.ContainsKey(actor)) rivalProgress.Add(actor, actor.transform.position.z - raceStartZ);
+        }
+
+        public void ReportRivalProgress(RaceActor actor, float progress)
+        {
+            if (actor != null && rivalProgress.ContainsKey(actor)) rivalProgress[actor] = progress;
+        }
+
+        public void UpdatePolicePressure(float closestDistance, float deltaTime)
+        {
+            if (Phase != RacePhase.Racing || !IsPoliceEscape) return;
+            PolicePressure = closestDistance < 6.2f
+                ? Mathf.Min(8f, PolicePressure + deltaTime)
+                : Mathf.Max(0f, PolicePressure - deltaTime * 0.65f);
+            if (PolicePressure >= 8f)
+            {
+                WasCaptured = true;
+                CompleteRace();
+            }
+        }
 
         private void Start() => ResetRace();
 
@@ -86,6 +117,11 @@ namespace StreetVelocity.Racing
         public void ResetRace()
         {
             EventIndex = Mathf.Clamp(PlayerCareerSave.SelectedEvent, 0, 4);
+            raceStartZ = vehicle != null ? vehicle.transform.position.z : 0f;
+            rivalProgress.Clear();
+            PolicePressure = 0f;
+            WasCaptured = false;
+            FinishPosition = 1;
             CurrentLap = 1;
             NextCheckpoint = 0;
             ElapsedSeconds = 0f;
@@ -99,9 +135,18 @@ namespace StreetVelocity.Racing
         private void CompleteRace()
         {
             if (IsFinished) return;
+            FinishPosition = WasCaptured ? 6 : Position;
             Phase = RacePhase.Finished;
             vehicle?.SetDrivingEnabled(false);
             Finished?.Invoke(ElapsedSeconds);
+        }
+
+        private int CountRivalsAhead()
+        {
+            var ahead = 0;
+            foreach (var progress in rivalProgress.Values)
+                if (progress > PlayerProgress) ahead++;
+            return ahead;
         }
     }
 }

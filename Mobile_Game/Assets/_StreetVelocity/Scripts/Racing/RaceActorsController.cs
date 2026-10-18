@@ -38,6 +38,16 @@ namespace StreetVelocity.Racing
                 if (actor != null) actor.enabled = false;
         }
 
+        private void Update()
+        {
+            if (raceManager == null || player == null || !raceManager.IsPoliceEscape || raceManager.Phase != RacePhase.Racing) return;
+            var closest = float.MaxValue;
+            foreach (var actor in actors)
+                if (actor != null && actor.IsPolice)
+                    closest = Mathf.Min(closest, Vector3.Distance(actor.transform.position, player.transform.position));
+            raceManager.UpdatePolicePressure(closest, Time.deltaTime);
+        }
+
         private void SpawnActors()
         {
             if (spawned || raceManager == null || player == null) return;
@@ -47,7 +57,7 @@ namespace StreetVelocity.Racing
             {
                 var rivalColors = new[] { new Color(0.04f, 0.56f, 0.82f), new Color(0.8f, 0.05f, 0.18f), new Color(0.48f, 0.25f, 0.82f), new Color(0.9f, 0.48f, 0.04f) };
                 for (var i = 0; i < 4; i++)
-                    CreateActor($"AI Rival {i + 1}", false, false, rivalColors[i], 35f + i * 2.5f,
+                    CreateActor($"AI Rival {i + 1}", false, false, rivalColors[i], 48f + i * 3f,
                         player.transform.position + Vector3.forward * (22f + i * 14f), (i % 2 == 0 ? -1f : 1f) * (2.4f + (i % 3) * 2.4f));
             }
 
@@ -88,8 +98,10 @@ namespace StreetVelocity.Racing
                 Primitive("Front Lamp", PrimitiveType.Cube, root.transform, new Vector3(side * 0.58f, 0.62f, 1.82f),
                     new Vector3(0.3f, 0.1f, 0.06f), police ? (side < 0 ? Color.red : Color.cyan) : Color.white);
             }
-            root.GetComponent<RaceActor>().Configure(player, speed, lane, police, traffic);
-            actors.Add(root.GetComponent<RaceActor>());
+            var actor = root.GetComponent<RaceActor>();
+            actor.Configure(raceManager, player, speed, lane, police, traffic);
+            actors.Add(actor);
+            if (!traffic && !police) raceManager.RegisterRival(actor);
         }
 
         private static GameObject Primitive(string name, PrimitiveType type, Transform parent, Vector3 localPosition, Vector3 scale, Color color)
