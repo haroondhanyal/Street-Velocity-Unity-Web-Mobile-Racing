@@ -1,3 +1,4 @@
+using StreetVelocity.Progression;
 using UnityEngine;
 
 namespace StreetVelocity.Vehicle
@@ -11,6 +12,7 @@ namespace StreetVelocity.Vehicle
         private Rigidbody body;
         private IVehicleInput input;
         private float nitroSeconds;
+        private bool drivingEnabled = true;
 
         public float SpeedKmh => body == null ? 0f : body.velocity.magnitude * 3.6f;
         public float Nitro01 => config == null || config.nitroCapacitySeconds <= 0f ? 0f : nitroSeconds / config.nitroCapacitySeconds;
@@ -26,15 +28,26 @@ namespace StreetVelocity.Vehicle
             if (input == null) Debug.LogError("Input source must implement IVehicleInput.", this);
         }
 
+        public void SetDrivingEnabled(bool enabled)
+        {
+            drivingEnabled = enabled;
+            if (!enabled && body != null)
+            {
+                body.velocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
+        }
+
         private void FixedUpdate()
         {
-            if (config == null || input == null) return;
+            if (!drivingEnabled || config == null || input == null) return;
             var forwardSpeed = Vector3.Dot(body.velocity, transform.forward);
             var throttle = input.Throttle;
+            var engineScale = 1f + Mathf.Max(0, PlayerCareerSave.EngineLevel - 1) * 0.035f;
             var boosting = input.Nitro && nitroSeconds > 0f;
-            var speedLimit = config.maxSpeed * (boosting ? 1.16f : 1f);
+            var speedLimit = config.maxSpeed * engineScale * (boosting ? 1.16f : 1f);
             if (throttle > 0f && forwardSpeed < speedLimit)
-                body.AddForce(transform.forward * (throttle * config.acceleration), ForceMode.Acceleration);
+                body.AddForce(transform.forward * (throttle * config.acceleration * engineScale), ForceMode.Acceleration);
             if (input.Brake)
                 body.AddForce(-transform.forward * (forwardSpeed > 1f ? config.braking : config.reverseAcceleration), ForceMode.Acceleration);
 

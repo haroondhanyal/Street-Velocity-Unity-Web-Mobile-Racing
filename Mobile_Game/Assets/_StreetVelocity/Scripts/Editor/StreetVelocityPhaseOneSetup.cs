@@ -106,7 +106,7 @@ namespace StreetVelocity.EditorTools
             CreatePanel<GarageScreen>(canvas.transform, router, "customize", "CUSTOMIZATION", "Paint · Rims · Spoiler · Tint · Plate", panels,
                 new[] { ("SAVE LOOK", "garage"), ("UPGRADES", "upgrades") });
             CreatePanel<GarageScreen>(canvas.transform, router, "upgrades", "UPGRADE SCREEN", "Engine · Turbo · ECU · Transmission · Tires · Brakes · Nitro", panels,
-                new[] { ("GARAGE", "garage"), ("RACE GRID", "race-start") });
+                new[] { ("GARAGE", "garage"), ("RACE GRID", "race-start"), ("UPGRADE ENGINE · 15,000 CR", "UPGRADE_ENGINE") });
             CreatePanel<RaceResultsScreen>(canvas.transform, router, "race-start", "RACE START", "Downtown · Event grid · Weather · Mobile controls", panels,
                 new[] { ("START RACE", "09_DriveTest"), ("WEATHER", "weather"), ("CONTROLS", "controls") });
             CreatePanel<RaceResultsScreen>(canvas.transform, router, "race", "IN-RACE HUD", "Position · Lap · Timer · Minimap · Steering · Nitro", panels,
@@ -196,6 +196,14 @@ namespace StreetVelocity.EditorTools
                 if (item.target == "09_DriveTest")
                 {
                     buttonObject.AddComponent<DriveSceneLaunchButton>();
+                }
+                else if (item.target == "UPGRADE_ENGINE")
+                {
+                    buttonObject.AddComponent<UpgradePurchaseButton>();
+                }
+                else if (id == "rewards" && item.label == "CLAIM")
+                {
+                    buttonObject.AddComponent<DailyRewardClaimButton>();
                 }
                 else
                 {

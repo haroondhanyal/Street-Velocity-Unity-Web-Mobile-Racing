@@ -1,19 +1,17 @@
 # Street Velocity web and mobile build
 
-The playable browser edition is in `Web_Game/`. It uses a responsive browser layout, supports keyboard and touch driving, saves the local garage and credits in browser storage, and can be installed as a landscape PWA.
+The browser edition in `Web_Game/` includes responsive desktop/phone screens, PWA install support, local profile progression, arcade driving, and a complete Phase 3 browser race loop.
 
 ## Run locally
-
-Serve the workspace over HTTP so the service worker can install:
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/Web_Game/`. On a phone on the same network, open the computer's local IP at port `8000`; install it from the browser menu. A static host can publish the contents of `Web_Game/` directly.
+Open `http://localhost:8000/Web_Game/`. On a phone on the same network, use the computer's local IP at port `8000` and install from the browser menu. A static host can publish the contents of `Web_Game/` directly.
 
-## Unity targets
+## Unity mobile
 
-The separate native mobile source is under `Mobile_Game/Assets/_StreetVelocity/`. Add that `Assets` folder to a Unity 2022.3 LTS or newer project. Run **Street Velocity > Phase 1 > Setup Foundation**, then **Street Velocity > Phase 2 > Build Driving Test Scene**. The generated Unity screens are visual navigation mockups and the test scene has arcade driving. Phase 3 race events and AI still need development. Configure Android or iOS in Unity Build Settings for native builds.
+The separate Android/iOS source is under `Mobile_Game/Assets/_StreetVelocity/`. Copy `Mobile_Game/Assets/` into Unity 2022.3 LTS or newer, then run **Street Velocity > Phase 1 > Setup Foundation** and **Street Velocity > Phase 2 > Build Driving Test Scene**. The generated test scene includes Phase 3 countdown, ordered checkpoints, race timer, finish results, local rewards, retry, and garage return. Native source has one one-lap sprint and primitive vehicle/city art; AI, production tracks/assets, and device QA are future work.
 
-The game artwork is copied into both projects. Browser game state is local to that device and is not synced with native builds.
+The browser and Unity builds keep separate local saves.

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
+using StreetVelocity.Racing;
 using StreetVelocity.UI;
 using StreetVelocity.Vehicle;
 using UnityEditor;
@@ -16,6 +17,7 @@ namespace StreetVelocity.EditorTools
     {
         private const string ScenePath = "Assets/_StreetVelocity/Scenes/09_DriveTest.unity";
         private const string ConfigPath = "Assets/_StreetVelocity/ScriptableObjects/Cars/FalconR_Drive.asset";
+        private const string RacePath = "Assets/_StreetVelocity/ScriptableObjects/Races/DowntownSprint.asset";
         private const string MaterialFolder = "Assets/_StreetVelocity/Art/Materials";
         private static readonly Dictionary<string, Material> MaterialCache = new Dictionary<string, Material>();
 
@@ -32,7 +34,8 @@ namespace StreetVelocity.EditorTools
             CreateLighting();
             CreateStreet();
             var mobileInput = CreateVehicle(config, out var vehicle, out var cameraFollow);
-            CreateHud(vehicle, mobileInput);
+            var raceManager = CreateRaceSystem(vehicle);
+            CreateHud(vehicle, mobileInput, raceManager);
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddBuildScene(ScenePath);
             EditorSceneManager.OpenScene(ScenePath);
@@ -177,7 +180,60 @@ namespace StreetVelocity.EditorTools
             return mobileInput;
         }
 
-        private static void CreateHud(VehicleController vehicle, MobileVehicleInput input)
+        private static RaceManager CreateRaceSystem(VehicleController vehicle)
+        {
+            EnsureFolder("Assets/_StreetVelocity/ScriptableObjects/Races");
+            var definition = AssetDatabase.LoadAssetAtPath<RaceDefinition>(RacePath);
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<RaceDefinition>();
+                AssetDatabase.CreateAsset(definition, RacePath);
+            }
+            definition.laps = 1;
+            definition.checkpointCount = 4;
+            definition.countdownSeconds = 3f;
+            definition.creditsReward = 8000;
+            definition.xpReward = 1200;
+            EditorUtility.SetDirty(definition);
+
+            var managerObject = new GameObject("Race Manager");
+            var manager = managerObject.AddComponent<RaceManager>();
+            var serialized = new SerializedObject(manager);
+            serialized.FindProperty("definition").objectReferenceValue = definition;
+            serialized.FindProperty("vehicle").objectReferenceValue = vehicle;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            var cyan = Material("Checkpoint Cyan", new Color(0.02f, 0.55f, 0.8f), 0.25f, new Color(0.05f, 0.9f, 1f));
+            var pink = Material("Checkpoint Magenta", new Color(0.7f, 0.03f, 0.22f), 0.2f, new Color(1f, 0.035f, 0.24f));
+            var checkpoints = new[] { 145f, 305f, 465f, 625f };
+            for (var i = 0; i < checkpoints.Length; i++)
+                CreateCheckpoint(i, checkpoints[i], manager, cyan, pink);
+            return manager;
+        }
+
+        private static void CreateCheckpoint(int order, float z, RaceManager manager, Material cyan, Material pink)
+        {
+            var gate = new GameObject($"Checkpoint {order + 1:00}", typeof(BoxCollider), typeof(RaceCheckpoint));
+            gate.transform.position = new Vector3(0f, 2.4f, z);
+            var trigger = gate.GetComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.size = new Vector3(18.8f, 5f, 1.5f);
+            var checkpoint = gate.GetComponent<RaceCheckpoint>();
+            var serialized = new SerializedObject(checkpoint);
+            serialized.FindProperty("order").intValue = order;
+            serialized.FindProperty("raceManager").objectReferenceValue = manager;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            foreach (var side in new[] { -1f, 1f })
+            {
+                var post = Cube("Checkpoint Neon Post", new Vector3(side * 9.1f, 2.45f, z), new Vector3(0.28f, 4.8f, 0.28f), side < 0 ? cyan : pink, gate.transform);
+                post.GetComponent<Collider>().enabled = false;
+            }
+            var beam = Cube("Checkpoint Neon Beam", new Vector3(0f, 4.8f, z), new Vector3(18.5f, 0.22f, 0.26f), cyan, gate.transform);
+            beam.GetComponent<Collider>().enabled = false;
+        }
+
+        private static void CreateHud(VehicleController vehicle, MobileVehicleInput input, RaceManager raceManager)
         {
             var canvasObject = new GameObject("Driving HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasObject.GetComponent<Canvas>();
@@ -193,6 +249,8 @@ namespace StreetVelocity.EditorTools
             var speed = MakeText(canvas.transform, "Speed", "000", 70, new Vector2(0.88f, 0.82f), new Vector2(260f, 100f), TextAnchor.MiddleCenter);
             var gear = MakeText(canvas.transform, "Gear", "1", 28, new Vector2(0.88f, 0.72f), new Vector2(200f, 45f), TextAnchor.MiddleCenter);
             var timer = MakeText(canvas.transform, "Race Timer", "00:00.000", 27, new Vector2(0.15f, 0.93f), new Vector2(270f, 55f), TextAnchor.MiddleLeft);
+            var lap = MakeText(canvas.transform, "Lap Progress", "LAP 1 / 1", 23, new Vector2(0.15f, 0.875f), new Vector2(270f, 42f), TextAnchor.MiddleLeft);
+            var checkpoint = MakeText(canvas.transform, "Checkpoint Progress", "CHECKPOINT 1 / 4", 20, new Vector2(0.15f, 0.83f), new Vector2(310f, 40f), TextAnchor.MiddleLeft);
             MakeText(canvas.transform, "District", "NEON DISTRICT  /  DOWNTOWN", 22, new Vector2(0.5f, 0.94f), new Vector2(560f, 52f), TextAnchor.MiddleCenter);
             MakeText(canvas.transform, "Controls Hint", "WASD / ARROWS · SPACE BRAKE · SHIFT DRIFT · N NITRO", 18, new Vector2(0.5f, 0.04f), new Vector2(650f, 42f), TextAnchor.MiddleCenter);
             CreateMenuButton(canvas.transform);
@@ -210,15 +268,63 @@ namespace StreetVelocity.EditorTools
             hudSerialized.FindProperty("speedText").objectReferenceValue = speed;
             hudSerialized.FindProperty("gearText").objectReferenceValue = gear;
             hudSerialized.FindProperty("timerText").objectReferenceValue = timer;
+            hudSerialized.FindProperty("lapText").objectReferenceValue = lap;
+            hudSerialized.FindProperty("checkpointText").objectReferenceValue = checkpoint;
             hudSerialized.FindProperty("nitroFill").objectReferenceValue = nitroFill;
+            hudSerialized.FindProperty("raceManager").objectReferenceValue = raceManager;
+
+            var countdown = MakeText(canvas.transform, "Race Countdown", "3", 150, new Vector2(0.5f, 0.53f), new Vector2(420f, 190f), TextAnchor.MiddleCenter);
+            var finishPanel = CreateFinishPanel(canvas.transform, out var resultTitle, out var resultSummary, out var retryButton, out var garageButton);
+            hudSerialized.FindProperty("countdownText").objectReferenceValue = countdown;
+            hudSerialized.FindProperty("finishPanel").objectReferenceValue = finishPanel;
+            hudSerialized.FindProperty("resultTitle").objectReferenceValue = resultTitle;
+            hudSerialized.FindProperty("resultSummary").objectReferenceValue = resultSummary;
+            hudSerialized.FindProperty("retryButton").objectReferenceValue = retryButton;
+            hudSerialized.FindProperty("garageButton").objectReferenceValue = garageButton;
+            var controlsRoot = new GameObject("Touch Controls", typeof(RectTransform));
+            controlsRoot.transform.SetParent(canvas.transform, false);
+            var controlsRect = controlsRoot.GetComponent<RectTransform>();
+            controlsRect.anchorMin = Vector2.zero; controlsRect.anchorMax = Vector2.one;
+            controlsRect.offsetMin = Vector2.zero; controlsRect.offsetMax = Vector2.zero;
+            hudSerialized.FindProperty("drivingControlsRoot").objectReferenceValue = controlsRoot;
             hudSerialized.ApplyModifiedPropertiesWithoutUndo();
 
-            CreateDriveButton(canvas.transform, input, "STEER LEFT", "◀", MobileDriveButton.DriveAction.SteerLeft, new Vector2(0.07f, 0.16f), new Vector2(132f, 132f));
-            CreateDriveButton(canvas.transform, input, "STEER RIGHT", "▶", MobileDriveButton.DriveAction.SteerRight, new Vector2(0.20f, 0.16f), new Vector2(132f, 132f));
-            CreateDriveButton(canvas.transform, input, "BRAKE", "BRAKE", MobileDriveButton.DriveAction.Brake, new Vector2(0.75f, 0.15f), new Vector2(150f, 100f));
-            CreateDriveButton(canvas.transform, input, "THROTTLE", "GO", MobileDriveButton.DriveAction.Throttle, new Vector2(0.88f, 0.16f), new Vector2(150f, 116f));
-            CreateDriveButton(canvas.transform, input, "HANDBRAKE", "DRIFT", MobileDriveButton.DriveAction.Handbrake, new Vector2(0.73f, 0.30f), new Vector2(128f, 78f));
-            CreateDriveButton(canvas.transform, input, "NITRO", "N₂O", MobileDriveButton.DriveAction.Nitro, new Vector2(0.88f, 0.31f), new Vector2(128f, 78f));
+            CreateDriveButton(controlsRoot.transform, input, "STEER LEFT", "◀", MobileDriveButton.DriveAction.SteerLeft, new Vector2(0.07f, 0.16f), new Vector2(132f, 132f));
+            CreateDriveButton(controlsRoot.transform, input, "STEER RIGHT", "▶", MobileDriveButton.DriveAction.SteerRight, new Vector2(0.20f, 0.16f), new Vector2(132f, 132f));
+            CreateDriveButton(controlsRoot.transform, input, "BRAKE", "BRAKE", MobileDriveButton.DriveAction.Brake, new Vector2(0.75f, 0.15f), new Vector2(150f, 100f));
+            CreateDriveButton(controlsRoot.transform, input, "THROTTLE", "GO", MobileDriveButton.DriveAction.Throttle, new Vector2(0.88f, 0.16f), new Vector2(150f, 116f));
+            CreateDriveButton(controlsRoot.transform, input, "HANDBRAKE", "DRIFT", MobileDriveButton.DriveAction.Handbrake, new Vector2(0.73f, 0.30f), new Vector2(128f, 78f));
+            CreateDriveButton(controlsRoot.transform, input, "NITRO", "N₂O", MobileDriveButton.DriveAction.Nitro, new Vector2(0.88f, 0.31f), new Vector2(128f, 78f));
+        }
+
+        private static GameObject CreateFinishPanel(Transform parent, out Text title, out Text summary, out Button retry, out Button garage)
+        {
+            var overlay = new GameObject("Race Results Overlay", typeof(RectTransform), typeof(Image));
+            overlay.transform.SetParent(parent, false);
+            var rect = overlay.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero; rect.offsetMax = Vector2.zero;
+            overlay.GetComponent<Image>().color = new Color(0.015f, 0.03f, 0.055f, 0.94f);
+
+            var card = MakeImage(overlay.transform, "Race Results Card", new Color(0.035f, 0.075f, 0.12f, 1f), new Vector2(0.5f, 0.5f), new Vector2(840f, 570f));
+            title = MakeText(card.transform, "Results Title", "RACE COMPLETE · 1ST PLACE", 48, new Vector2(0.5f, 0.84f), new Vector2(760f, 90f), TextAnchor.MiddleCenter);
+            summary = MakeText(card.transform, "Results Summary", "TIME  00:00.000\nREWARD  8,000 CREDITS  ·  1,200 XP", 28, new Vector2(0.5f, 0.53f), new Vector2(720f, 230f), TextAnchor.MiddleCenter);
+            retry = MakeResultButton(card.transform, "Retry Race", "RACE AGAIN", new Vector2(0.34f, 0.17f));
+            garage = MakeResultButton(card.transform, "Return to Garage", "GARAGE", new Vector2(0.67f, 0.17f));
+            overlay.SetActive(false);
+            return overlay;
+        }
+
+        private static Button MakeResultButton(Transform parent, string name, string label, Vector2 anchor)
+        {
+            var obj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            obj.transform.SetParent(parent, false);
+            var rect = obj.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = anchor;
+            rect.sizeDelta = new Vector2(250f, 74f);
+            obj.GetComponent<Image>().color = new Color(0.02f, 0.58f, 0.9f, 1f);
+            MakeText(obj.transform, name + " Label", label, 25, new Vector2(0.5f, 0.5f), new Vector2(240f, 64f), TextAnchor.MiddleCenter);
+            return obj.GetComponent<Button>();
         }
 
         private static void CreateDriveButton(Transform parent, MobileVehicleInput input, string name, string label,

@@ -1,15 +1,17 @@
 # Street Velocity — Unity Mobile Game
 
-Street Velocity is a neon night racing game for Android and iOS. Phase 1 provides the 22-screen navigation and garage flow; Phase 2 adds arcade vehicle physics, nitro, drift handling, a follow camera, race HUD, and touch controls. Its screen composition is built for landscape phone play and shares the visual theme with the separate browser edition.
+Android/iOS Unity source for the neon racing project. Phase 1 generates all 22 landscape navigation screens and local reward/upgrade actions. Phase 2 generates arcade vehicle physics, nitro/drift, chase camera, HUD, and touch controls. Phase 3 adds a countdown, ordered checkpoint gates, a race timer, a finish/results overlay, retry/garage actions, and PlayerPrefs rewards/progression.
 
-The Unity scenes are generated in the Editor from the included setup tools. The driving test scene currently uses a primitive vehicle and generated city geometry.
+## Generate and play
 
-## Open in Unity
+Use Unity 2022.3 LTS or newer:
 
-Create or open a Unity 2022.3 LTS project, then copy this folder's `Assets/` directory into its project root. After Unity compiles, choose **Street Velocity > Phase 1 > Setup Foundation**, then **Street Velocity > Phase 2 > Build Driving Test Scene**. Open `Assets/_StreetVelocity/Scenes/00_Boot.unity` and press Play. Select Career → Event → Race Start → Start Race to drive.
+1. Copy this folder's `Assets/` into the Unity project root.
+2. After Unity compiles the scripts, run **Street Velocity > Phase 1 > Setup Foundation**.
+3. Run **Street Velocity > Phase 2 > Build Driving Test Scene**.
+4. Open `Assets/_StreetVelocity/Scenes/00_Boot.unity` and press Play. Go through Career → Event → Race Start → Start Race.
+5. Drive through the four checkpoint gates in order. Finish results save credits, XP, player level, wins, and best time locally.
 
-Desktop uses WASD/arrows, Space to brake, Left Shift for handbrake, and N for nitro. Android/iOS use the on screen controls.
+Use WASD/arrows, Space, Shift, and N in the Editor; Android/iOS uses the screen buttons. Install the platform build support in Unity Hub and set Android/iOS build settings for a device build.
 
-For a device build, install Android or iOS Build Support in Unity Hub and configure the signing and platform settings. The setup script selects landscape orientation. Detailed notes are in the workspace [`UNITY_SETUP_CHECKLIST.md`](../UNITY_SETUP_CHECKLIST.md).
-
-The browser edition's actual desktop and phone screenshots are in [`Web_Game/screenshots/`](../Web_Game/screenshots/) on the repository's `main` branch.
+The generated Unity race is one one-lap Downtown Sprint with primitive vehicle and city geometry. The source scene generator has not been run in Unity in this workspace. See [`UNITY_SETUP_CHECKLIST.md`](../UNITY_SETUP_CHECKLIST.md) for the detailed flow and current limits.

@@ -1,18 +1,24 @@
 # Game Design
 
-Street Velocity is an original mobile-first arcade street racing game with keyboard support during development. The core loop is: choose a race, select a car, drive through ordered checkpoints, earn credits and XP, improve the garage, and unlock further events.
+Street Velocity is an original neon-night arcade street racer for desktop browsers and landscape Android/iOS devices. The current core loop is: choose a car and event, start a race, clear its route checkpoints, finish, earn credits/XP, and return to the garage or career map.
 
-## Four content phases
+## Delivery phases
 
-1. **Foundation** — boot, main menu, garage and career screen shells with a shared navigation pattern.
-2. **Driving** — responsive arcade handling with accelerate, brake/reverse, steering, handbrake and nitro inputs.
-3. **Race loop** — countdown, checkpoints/laps, finish/results, credits/XP and local progression.
-4. **World expansion** — AI opponents, multiple tracks and race types, traffic/pursuits, upgrades, weather, achievements and mobile polish.
+1. **Foundation and screens** — boot/splash, main menu, all 22 reference screens, navigation, car/event selection, garage, local profile, daily reward, upgrade purchase, settings, and responsive layouts.
+2. **Driving** — accelerate, brake/reverse, steering, handbrake drift, nitro, chase camera, speed/HUD, keyboard and touch controls.
+3. **Race loop** — countdown, race timer, lap/checkpoint progress, rival placement in the browser edition, finish, result summary, rewards, XP/level progression, best-time record, retry and return flow.
+4. **World expansion** — native AI racers, multiple Unity tracks and event definitions, traffic/pursuits, deeper upgrade/customization data, dynamic weather, audio, production vehicle art, optimization, and device QA.
 
 ## Screen flow
 
-Boot → Main Menu → Career/Event → Garage/Car Selection → Race → Results → Garage or next event. Quick Race can branch from Main Menu and reuse the same selection and race flow.
+Splash → Home → Career map → Event selection → Car/garage → Race start → Countdown → Race HUD → Results → Retry, garage, or career. Quick race can reuse the same race setup.
+
+## Race rules in the current build
+
+- Browser races have five paced rivals and calculate finishing position from route progress. Each event defines its lap count and route length; six checkpoint sectors divide each lap.
+- Unity's generated Downtown Sprint is a single-player one-lap event. It starts after a three-second countdown, accepts four ordered physical trigger gates, then shows results and saves credits, XP, level, wins, and best time locally.
+- Web localStorage and Unity PlayerPrefs are independent. Neither edition currently synchronizes player accounts.
 
 ## Extensibility rule
 
-Screens own presentation and user actions. They call feature interfaces; they do not contain vehicle physics, economy rules, persistence, or scene-loading logic. New events and cars should be data assets rather than edits to a central gameplay class.
+Screens own presentation and player actions. Vehicle physics, race rules, economy, persistence, and scene loading stay in their feature components. New event definitions and vehicle configs should be data assets.
