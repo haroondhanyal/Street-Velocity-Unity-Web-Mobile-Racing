@@ -3,12 +3,12 @@
 ## Phase 1 — Foundation and screens
 
 - **Web:** Responsive desktop/phone UI covers the 22 reference screens: splash, home, career map, event selection, car selection, garage, customization, upgrades, race start/HUD, drifting, nitro, police, traffic, results, daily reward, achievements, settings, mobile controls, minimap, weather, and world environments. It includes selectable districts/events/cars, saved customization and upgrades, daily streak rewards, achievements, graphics/control/weather preferences, and local profile persistence.
-- **Unity mobile:** Editor generators create the 22 landscape navigation screens, themed screen artwork, selectable cars/events/paint, career overview, achievements, control modes, sensitivity/inversion, graphics quality, weather, daily rewards, and engine upgrade flow. PlayerPrefs saves selections and progression.
+- **Unity mobile:** Editor generators create the 22 landscape navigation screens, themed screen artwork, selectable cars/events/paint, career overview, achievements, control modes, sensitivity/inversion, graphics quality, weather, daily rewards, and an eight-part purchase screen (Engine, Turbo, ECU, Transmission, Tires, Brakes, Suspension, Nitro). Purchases save per selected car through PlayerPrefs.
 
 ## Phase 2 — Driving and controls
 
-- **Web:** Perspective road renderer, player vehicle, moving rivals/traffic, steering, throttle, brake/reverse, handbrake/drift, nitro, pause, keyboard, touch arrows, virtual wheel, and tilt input with saved sensitivity/inversion. Weather effects and graphics settings affect rendering.
-- **Unity mobile:** Rigidbody arcade vehicle with car-specific speed/acceleration/steering, selected paint, nitro, drift scoring, chase camera, speed/gear/nitro HUD, touch buttons, drag steering wheel, accelerometer steering, and saved control preferences. Generated environment has clear/night/rain/fog lighting and rain particles.
+- **Web:** Perspective road renderer, player vehicle, moving rivals/traffic, steering, throttle, brake/reverse, handbrake/drift, nitro, pause, keyboard, touch arrows, virtual wheel, and tilt input with saved sensitivity/inversion. Engine, turbo, ECU, transmission, tires, brakes, suspension, and nitro purchases alter the race car performance; upgrades are saved separately for each car. Weather effects and graphics settings affect rendering.
+- **Unity mobile:** Rigidbody arcade vehicle with car-specific speed/acceleration/steering, selected paint, nitro, drift scoring, chase camera, speed/gear/nitro HUD, touch buttons, drag steering wheel, accelerometer steering, and saved control preferences. All eight workshop parts improve the related race physics and are saved per selected car. Generated environment has clear/night/rain/fog lighting and rain particles.
 
 ## Phase 3 — Events, race rules, and progression
 

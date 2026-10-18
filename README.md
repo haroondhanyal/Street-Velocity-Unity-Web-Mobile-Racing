@@ -1,6 +1,6 @@
 # Street Velocity — Mobile Racing Game
 
-Street Velocity is a neon night racer for landscape Android/iOS, with a separately maintained responsive browser edition. Phase 1 provides 22 reference-inspired screens and career/garage flows; Phase 2 adds arcade driving and mobile touch, wheel, and tilt controls; Phase 3 adds five race event rules, results, rewards, and local progression. The web edition has its own race rendering, including rival placement, traffic hazards, drift scoring, and time trial targets.
+Street Velocity is a neon night racer for landscape Android/iOS, with a separately maintained responsive browser edition. Phases 1–4 include 22 reference-inspired screens, career and garage flows, mobile touch/wheel/tilt controls, five race events, rewards and local progression, eight purchasable performance parts per car, and prototype traffic, rivals, and police actors. The browser edition also has its own race rendering with drift scoring and time trial targets.
 
 ## Game screenshots
 
