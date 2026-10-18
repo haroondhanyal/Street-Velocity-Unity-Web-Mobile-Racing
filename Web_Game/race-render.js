@@ -85,12 +85,18 @@
       const x = center + opponent.lane * half * 0.72;
       const w = 5 + t * 34;
       const h = 7 + t * 52;
-      const color = index % 2 ? '#22d9ff' : '#ff285f';
-      ctx.fillStyle = '#03070d';
+      const police = state.raceMode === 'police';
+      const traffic = state.raceMode === 'traffic';
+      const color = traffic ? (index % 2 ? '#e6edf2' : '#e9a43b') : index % 2 ? '#22d9ff' : '#ff285f';
+      ctx.fillStyle = police ? '#10151e' : traffic ? '#222a32' : '#03070d';
       ctx.fillRect(x - w * 0.55, y - h * 0.78, w * 1.1, h);
-      ctx.fillStyle = color;
+      ctx.fillStyle = police ? (Math.floor(now / 130 + index) % 2 ? '#ff304d' : '#21caff') : color;
       ctx.fillRect(x - w * 0.5, y - h * 0.18, w * 0.2, Math.max(2, h * 0.08));
       ctx.fillRect(x + w * 0.3, y - h * 0.18, w * 0.2, Math.max(2, h * 0.08));
+      if (police && t > 0.3) {
+        ctx.fillStyle = Math.floor(now / 130 + index) % 2 ? '#ff304d' : '#21caff';
+        ctx.fillRect(x - w * 0.18, y - h * 0.69, w * 0.36, Math.max(2, h * 0.07));
+      }
     }
 
     if (car.complete && car.naturalWidth) {

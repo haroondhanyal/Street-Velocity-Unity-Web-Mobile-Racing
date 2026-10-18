@@ -9,8 +9,8 @@
   const eventData = [
     {name:'Street Sprint',type:'SPRINT RACE',reward:'8,000',xp:'1,200',rec:290,icon:'➤',laps:1,length:1250},
     {name:'Circuit Race',type:'CIRCUIT · 3 LAPS',reward:'12,000',xp:'1,800',rec:320,icon:'◉',laps:3,length:720},
-    {name:'Drift Event',type:'STYLE CHALLENGE',reward:'9,500',xp:'1,500',rec:270,icon:'⤴',laps:1,length:1000},
-    {name:'Time Trial',type:'BEAT THE CLOCK',reward:'7,500',xp:'900',rec:300,icon:'◷',laps:1,length:1150},
+    {name:'Drift Event',type:'STYLE CHALLENGE · 3,000 PTS',reward:'9,500',xp:'1,500',rec:270,icon:'⤴',laps:1,length:1000},
+    {name:'Time Trial',type:'BEAT 28 SECOND TARGET',reward:'7,500',xp:'900',rec:300,icon:'◷',laps:1,length:1150,targetSeconds:28},
     {name:'Police Escape',type:'PURSUIT · 2:00',reward:'14,000',xp:'2,200',rec:330,icon:'✦',laps:1,length:1350}
   ];
   const load = () => { try { return JSON.parse(localStorage.getItem('streetVelocity') || '{}'); } catch { return {}; } };
@@ -49,14 +49,14 @@
   function renderRace(mode='race'){
     const special={drift:['DRIFT EVENT','GREAT DRIFT!'],nitro:['NITRO BOOST','PERFECT NITRO!'],police:['POLICE ESCAPE','HEAT LEVEL 3'],traffic:['TRAFFIC SYSTEM','CITY TRAFFIC']};
     const feat=special[mode]?.[1]||'';const race=ev();
-    q(`[data-page="${mode}"]`).innerHTML=`<div class="race-stage"><div class="race-world"></div><canvas id="raceCanvas" class="race-canvas"></canvas><div class="race-feature" id="raceFeature" style="display:${feat?'block':'none'}">${feat}<small id="driftPoints" style="display:block;font-size:.55em;color:white">0 PTS</small></div><div class="race-hud"><div class="hud-top"><div class="hud-card"><small>POS &nbsp; <b id="position">6 / 6</b></small><small>LAP &nbsp; <b id="lap">1 / ${race.laps}</b></small><small>CP &nbsp; <b id="checkpoint">1 / 6</b></small><b id="timer">00:00.000</b></div><div class="hud-center"><strong id="raceTitle">${mode==='police'?'ESCAPE THE PURSUIT':race.name.toUpperCase()}</strong><div id="raceHint" style="font-size:12px;letter-spacing:1px">3 · 2 · 1 · GO! — CHECKPOINT 1</div></div><div class="race-tools"><div class="mini-map"></div><button data-screen="minimap">MAP</button><button data-pause aria-label="Pause race">Ⅱ</button></div></div><div class="hud-bottom"><div class="steer-controls"><button class="control-btn" data-steer="-1" aria-label="Steer left">‹</button><button class="control-btn" data-steer="1" aria-label="Steer right">›</button></div><div class="drive-controls"><button class="drive-control" data-brake aria-label="Brake">▼</button><button class="drive-control" data-throttle aria-label="Accelerate">▲</button></div><div style="display:flex;align-items:end;gap:11px"><button class="nitro-control" data-nitro aria-label="Nitro">ϟ</button><div class="speedometer"><div><b id="speed">000</b><small>km/h · <span id="gear">1</span></small></div></div></div></div>${state.settings.controlMethod==='Steering wheel'?'<div class="virtual-wheel race-wheel" data-race-wheel aria-label="Drag steering wheel">↻</div>':''}<button class="handbrake-control" data-handbrake aria-label="Handbrake">DRIFT</button></div><div class="race-countdown" id="raceCountdown">3</div></div>`;
+    q(`[data-page="${mode}"]`).innerHTML=`<div class="race-stage"><div class="race-world"></div><canvas id="raceCanvas" class="race-canvas"></canvas><div class="race-feature" id="raceFeature" style="display:${feat?'block':'none'}">${feat}<small id="driftPoints" style="display:block;font-size:.55em;color:white">0 PTS</small></div><div class="race-hud"><div class="hud-top"><div class="hud-card"><small>POS &nbsp; <b id="position">${state.event===3?'1 / 1':'6 / 6'}</b></small><small>LAP &nbsp; <b id="lap">1 / ${race.laps}</b></small><small>CP &nbsp; <b id="checkpoint">1 / 6</b></small><b id="timer">00:00.000</b></div><div class="hud-center"><strong id="raceTitle">${mode==='police'?'ESCAPE THE PURSUIT':mode==='traffic'?'TRAFFIC RUN':race.name.toUpperCase()}</strong><div id="raceHint" style="font-size:12px;letter-spacing:1px">3 · 2 · 1 · GO! — CHECKPOINT 1</div></div><div class="race-tools"><div class="mini-map"></div><button data-screen="minimap">MAP</button><button data-pause aria-label="Pause race">Ⅱ</button></div></div><div class="hud-bottom"><div class="steer-controls"><button class="control-btn" data-steer="-1" aria-label="Steer left">‹</button><button class="control-btn" data-steer="1" aria-label="Steer right">›</button></div><div class="drive-controls"><button class="drive-control" data-brake aria-label="Brake">▼</button><button class="drive-control" data-throttle aria-label="Accelerate">▲</button></div><div style="display:flex;align-items:end;gap:11px"><button class="nitro-control" data-nitro aria-label="Nitro">ϟ</button><div class="speedometer"><div><b id="speed">000</b><small>km/h · <span id="gear">1</span></small></div></div></div></div>${state.settings.controlMethod==='Steering wheel'?'<div class="virtual-wheel race-wheel" data-race-wheel aria-label="Drag steering wheel">↻</div>':''}<button class="handbrake-control" data-handbrake aria-label="Handbrake">DRIFT</button></div><div class="race-countdown" id="raceCountdown">3</div></div>`;
     const nitroButton=q(`[data-page="${mode}"] .nitro-control`);nitroButton?.insertAdjacentHTML('afterend','<div class="nitro-meter" aria-label="Nitro meter"><i id="nitroMeter"></i></div>');startRace(mode);
   }
   function formatTime(seconds){const ms=Math.floor((seconds%1)*1000).toString().padStart(3,'0');return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(Math.floor(seconds%60)).padStart(2,'0')}.${ms}`;}
   function renderResults(){
     const r=state.lastRace||{position:6,time:0,bestLap:0,reward:0,xp:0,driftScore:0};
-    const place=['1st','2nd','3rd'][r.position-1]||`${r.position}th`;const stars=Math.max(1,4-r.position);
-    q('#results').innerHTML=`<div class="results-layout"><div class="eyebrow">${state.district} · ${ev().name.toUpperCase()}</div><div class="results-bg"><div class="eyebrow">RACE COMPLETE · ${r.position} / 6</div><h1>${place} PLACE</h1><div class="stars">${'★ '.repeat(stars)}${'☆ '.repeat(3-stars)}</div><div class="results-stats"><div><small>RACE TIME</small><b>${formatTime(r.time)}</b></div><div><small>BEST LAP</small><b>${formatTime(r.bestLap)}</b></div><div><small>REWARD</small><b style="color:var(--gold)">◉ ${r.reward.toLocaleString()}</b></div><div><small>XP EARNED</small><b style="color:var(--cyan)">${r.xp.toLocaleString()}</b></div><div><small>BEST TIME</small><b>${formatTime(state.bestTime||r.time)}</b></div><div><small>DRIFT SCORE</small><b>${r.driftScore.toLocaleString()}</b></div></div><div class="actions" style="justify-content:center">${btn('RETRY','race-start','secondary')}${btn('CONTINUE','career')}</div></div></div>`;
+    const place=['1st','2nd','3rd'][r.position-1]||`${r.position}th`;const stars=Math.max(1,4-r.position);const resultTitle=state.event===3?(r.timeTrialSuccess?'TARGET BEATEN':'TARGET MISSED'):`${place} PLACE`;
+    q('#results').innerHTML=`<div class="results-layout"><div class="eyebrow">${state.district} · ${ev().name.toUpperCase()}</div><div class="results-bg"><div class="eyebrow">${state.event===3?`TIME TRIAL · ${formatTime(ev().targetSeconds)} TARGET`:`RACE COMPLETE · ${r.position} / 6`}</div><h1>${resultTitle}</h1><div class="stars">${'★ '.repeat(stars)}${'☆ '.repeat(3-stars)}</div><div class="results-stats"><div><small>RACE TIME</small><b>${formatTime(r.time)}</b></div><div><small>BEST LAP</small><b>${formatTime(r.bestLap)}</b></div><div><small>REWARD</small><b style="color:var(--gold)">◉ ${r.reward.toLocaleString()}</b></div><div><small>XP EARNED</small><b style="color:var(--cyan)">${r.xp.toLocaleString()}</b></div><div><small>BEST TIME</small><b>${formatTime(state.bestTime||r.time)}</b></div><div><small>${r.mode==='traffic'?'TRAFFIC HITS':'DRIFT SCORE'}</small><b>${r.mode==='traffic'?state.trafficHits:r.driftScore.toLocaleString()}</b></div></div><div class="actions" style="justify-content:center">${btn('RETRY','race-start','secondary')}${btn('CONTINUE','career')}</div></div></div>`;
   }
   function renderRewards(){
     const today=new Date().toISOString().slice(0,10);const claimed=state.dailyClaimedDate===today;const daily=[1000,1500,2000,2500,3000,4000,5000];const reward=daily[state.dailyStreak%7];const activeDay=claimed?((state.dailyStreak-1)%7)+1:(state.dailyStreak%7)+1;
@@ -98,7 +98,7 @@
   },true);
   function finishRace(mode){
     if(state.finished)return;state.finished=true;stopRace();
-    const position=mode==='drift'?1:state.position;const multiplier=position===1?1:position===2?.8:position===3?.65:.45;
+    const timeTrialSuccess=state.event===3&&state.raceSeconds<=ev().targetSeconds;const position=state.event===3?(timeTrialSuccess?1:2):mode==='drift'?1:state.position;const multiplier=position===1?1:state.event===3?.45:position===2?.8:position===3?.65:.45;
     const reward=Math.floor(Number(ev().reward.replaceAll(',',''))*multiplier+Math.min(2500,state.driftScore*.025));
     const xp=Math.floor(Number(ev().xp.replaceAll(',',''))*multiplier);
     const finalLap=state.raceSeconds-state.lapStartedAt;const bestLap=Math.min(state.bestLapTime||Infinity,finalLap);
@@ -107,13 +107,13 @@
     let nextLevel=state.level;let xpForLevel=100+Math.max(0,nextLevel-1)*50;
     while(state.xp>=xpForLevel){state.xp-=xpForLevel;nextLevel++;xpForLevel=100+Math.max(0,nextLevel-1)*50;}
     state.level=nextLevel;
-    state.lastRace={position,time:state.raceSeconds,bestLap,reward,xp,driftScore:Math.floor(state.driftScore),mode};persist();
+    state.lastRace={position,time:state.raceSeconds,bestLap,reward,xp,driftScore:Math.floor(state.driftScore),mode,timeTrialSuccess};persist();
     render();navigate('results');
   }
   function startRace(mode){
-    stopRace();currentRaceMode=mode;state.raceSeconds=0;state.distance=0;state.lap=1;state.checkpoint=1;state.driftScore=0;state.bestLapTime=0;state.lapStartedAt=0;state.finished=false;state.raceCountdown=3;state.speed=0;state.lane=0;state.steer=0;state.throttle=false;state.brake=false;state.handbrake=false;state.paused=false;state.nitro=100;state.nitroBoost=false;
+    stopRace();currentRaceMode=mode;state.raceMode=mode;state.trafficHits=0;state.trafficCooldown=0;state.raceSeconds=0;state.distance=0;state.lap=1;state.checkpoint=1;state.driftScore=0;state.bestLapTime=0;state.lapStartedAt=0;state.finished=false;state.raceCountdown=3;state.speed=0;state.lane=0;state.steer=0;state.throttle=false;state.brake=false;state.handbrake=false;state.paused=false;state.nitro=100;state.nitroBoost=false;
     const race=ev();const totalDistance=race.length*race.laps;const racePage=q(`[data-page="${mode}"]`);state.trackLength=race.length;state.totalRaceDistance=totalDistance;
-    state.opponents=Array.from({length:5},(_,i)=>({distance:(i-3)*30,speed:(car().speed*(0.76+i*0.045))/3.6,lane:[-.58,.48,-.12,.72,-.78][i],finished:false}));
+    state.opponents=mode==='traffic'?Array.from({length:5},(_,i)=>({distance:180+i*210,speed:19+(i%2)*4,lane:[-.62,.42,-.08,.68,-.35][i],finished:false,traffic:true})):state.event===3?[]:Array.from({length:5},(_,i)=>({distance:(i-3)*30,speed:(car().speed*(0.76+i*0.045))/3.6,lane:[-.58,.48,-.12,.72,-.78][i],finished:false}));
     let previous=performance.now();
     function frame(now){
       const targetFps=Number(state.settings.fps)||60;const frameGap=1000/targetFps;if(now-previous<frameGap-1){frameHandle=requestAnimationFrame(frame);return;}const dt=Math.min((now-previous)/1000,.05);previous=now;
@@ -129,7 +129,12 @@
           if(state.handbrake&&Math.abs(state.steer)>.1&&state.speed>45)state.driftScore+=dt*state.speed*1.8;
           state.highestSpeed=Math.max(state.highestSpeed||0,state.speed);
           state.opponents.forEach(op=>{if(!op.finished){op.distance+=op.speed*dt;if(op.distance>=totalDistance){op.distance=totalDistance;op.finished=true;}}});
-          state.position=1+state.opponents.filter(op=>op.distance>state.distance).length;
+          if(mode==='traffic'){
+            state.trafficCooldown=Math.max(0,state.trafficCooldown-dt);
+            const hazard=state.opponents.find(op=>op.traffic&&Math.abs(op.distance-state.distance)<6&&Math.abs(op.lane-state.lane)<.25);
+            if(hazard&&state.trafficCooldown===0){state.trafficHits++;state.trafficCooldown=1.4;state.speed*=.52;toast(`TRAFFIC COLLISION · ${state.trafficHits} HIT${state.trafficHits===1?'':'S'}`);}
+          }
+          state.position=state.event===3?1:1+state.opponents.filter(op=>op.distance>state.distance).length;
           const lapIndex=Math.min(race.laps-1,Math.floor(state.distance/race.length));
           if(lapIndex+1>state.lap){state.bestLapTime=state.bestLapTime?Math.min(state.bestLapTime,state.raceSeconds-state.lapStartedAt):state.raceSeconds-state.lapStartedAt;state.lapStartedAt=state.raceSeconds;state.lap=lapIndex+1;toast(`LAP ${state.lap} · CHECKPOINTS CLEARED`);}
           const lapMeters=state.distance%race.length;state.checkpoint=Math.min(6,Math.floor(lapMeters/(race.length/6))+1);
@@ -138,8 +143,8 @@
           const timer=racePage.querySelector('#timer');if(timer)timer.textContent=formatTime(state.raceSeconds);
           const lap=racePage.querySelector('#lap');if(lap)lap.textContent=`${state.lap} / ${race.laps}`;
           const checkpoint=racePage.querySelector('#checkpoint');if(checkpoint)checkpoint.textContent=`${state.checkpoint} / 6`;
-          const position=racePage.querySelector('#position');if(position)position.textContent=`${state.position} / 6`;
-          const hint=racePage.querySelector('#raceHint');if(hint)hint.textContent=mode==='drift'?`DRIFT SCORE ${Math.floor(state.driftScore).toLocaleString()} / 3,000 · HOLD DRIFT THROUGH TURNS`:`CHECKPOINT ${state.checkpoint} / 6 · ${Math.max(0,Math.ceil(totalDistance-state.distance)).toLocaleString()} M TO FINISH`;
+          const position=racePage.querySelector('#position');if(position)position.textContent=state.event===3?'1 / 1':`${state.position} / 6`;
+          const hint=racePage.querySelector('#raceHint');if(hint)hint.textContent=mode==='drift'?`DRIFT SCORE ${Math.floor(state.driftScore).toLocaleString()} / 3,000 · HOLD DRIFT THROUGH TURNS`:state.event===3?`TARGET ${formatTime(race.targetSeconds)} · FINISH IN TIME FOR FULL REWARD`:mode==='traffic'?`TRAFFIC HITS ${state.trafficHits} · SWITCH LANES TO AVOID CARS`:`CHECKPOINT ${state.checkpoint} / 6 · ${Math.max(0,Math.ceil(totalDistance-state.distance)).toLocaleString()} M TO FINISH`;
           const meter=racePage.querySelector('#nitroMeter');if(meter)meter.style.height=`${state.nitro}%`;
           if(mode==='drift'){const drift=racePage.querySelector('#driftPoints');if(drift)drift.textContent=`${Math.floor(state.driftScore).toLocaleString()} PTS · ×${state.handbrake&&state.steer!==0?'2.0':'1.0'}`;}
           if(mode==='drift'?state.driftScore>=3000:state.distance>=totalDistance)finishRace(mode);
