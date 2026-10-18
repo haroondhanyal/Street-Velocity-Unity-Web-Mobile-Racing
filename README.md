@@ -1,6 +1,6 @@
 # Street Velocity — Web Racing Game
 
-Street Velocity is a neon night street racing game built for desktop browsers and phone screens. Phase 1 provides the game screens and career flow; Phase 2 adds arcade driving with keyboard and touch controls. The visual direction follows the supplied city racing reference, with separate responsive layouts for desktop and mobile.
+Street Velocity is a neon night street racing game for desktop browsers and phone screens. Phase 1 builds the reference-inspired screens and career flow; Phase 2 adds arcade driving with keyboard and touch controls; Phase 3 adds countdown races against five rivals, laps, checkpoint sectors, placement-based credits and XP, daily rewards, engine upgrades, and saved progression. Desktop and phone layouts use separate responsive styling.
 
 ## Screenshots
 
@@ -25,4 +25,4 @@ Open [http://localhost:8000/](http://localhost:8000/) or [http://localhost:8000/
 - Desktop: WASD or arrow keys to steer and accelerate, Down or Space to brake, Shift to drift, and N for nitro.
 - Touch: on-screen steering, throttle, brake, drift, and nitro controls.
 
-Progress is saved locally in the browser. For Unity Android/iOS source, switch to the [`mobile` branch](https://github.com/haroondhanyal/Street-Velocity-Unity-Web-Mobile-Racing/tree/mobile).
+Progress is saved locally in the browser. See [`Web_Game/README.md`](Web_Game/README.md) for race flow and storage details. For Unity Android/iOS source, switch to the [`mobile` branch](https://github.com/haroondhanyal/Street-Velocity-Unity-Web-Mobile-Racing/tree/mobile).
