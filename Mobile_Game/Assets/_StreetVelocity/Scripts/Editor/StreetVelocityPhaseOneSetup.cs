@@ -160,7 +160,8 @@ namespace StreetVelocity.EditorTools
                 artRect.offsetMin = Vector2.zero; artRect.offsetMax = Vector2.zero;
                 var rawImage = artObject.GetComponent<RawImage>();
                 rawImage.texture = artwork;
-                rawImage.color = new Color(0.55f, 0.72f, 0.9f, 0.42f);
+                rawImage.color = ScreenArtTint(id);
+                rawImage.uvRect = ScreenArtCrop(id);
                 rawImage.raycastTarget = false;
             }
             if (id == "home" || id == "cars" || id == "garage" || id == "customize")
@@ -272,6 +273,24 @@ namespace StreetVelocity.EditorTools
             card.GetComponent<Image>().color = new Color(0.025f, 0.07f, 0.12f, 0.88f);
             AddText(card.transform, heading, 23, new Vector2(0f, 28f), new Vector2(size.x - 18f, 44f), FontStyle.Bold);
             AddText(card.transform, detail, 16, new Vector2(0f, -24f), new Vector2(size.x - 24f, 44f), FontStyle.Normal);
+        }
+
+        private static Color ScreenArtTint(string id)
+        {
+            if (id == "race" || id == "drift" || id == "police") return new Color(1f, 0.48f, 0.58f, 0.48f);
+            if (id == "garage" || id == "cars" || id == "customize" || id == "upgrades") return new Color(0.42f, 0.78f, 1f, 0.5f);
+            if (id == "career" || id == "worlds" || id == "minimap") return new Color(0.35f, 1f, 0.82f, 0.48f);
+            if (id == "rewards" || id == "results") return new Color(1f, 0.78f, 0.3f, 0.52f);
+            if (id == "weather") return new Color(0.62f, 0.72f, 1f, 0.46f);
+            return new Color(0.55f, 0.72f, 0.9f, 0.42f);
+        }
+
+        private static Rect ScreenArtCrop(string id)
+        {
+            if (id == "garage" || id == "cars" || id == "customize" || id == "upgrades") return new Rect(0.18f, 0.04f, 0.68f, 0.86f);
+            if (id == "career" || id == "worlds" || id == "minimap") return new Rect(0.02f, 0.08f, 0.96f, 0.78f);
+            if (id == "race" || id == "drift" || id == "police" || id == "traffic") return new Rect(0.32f, 0.02f, 0.64f, 0.94f);
+            return new Rect(0f, 0f, 1f, 1f);
         }
 
         private static void ConfigureRouter(ScreenRouter router, MonoBehaviour[] panels, string initialId)
