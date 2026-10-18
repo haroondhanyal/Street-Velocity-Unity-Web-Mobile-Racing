@@ -39,7 +39,7 @@ namespace StreetVelocity.Progression
         public static int GraphicsQuality => Mathf.Clamp(PlayerPrefs.GetInt(GraphicsQualityKey, 2), 0, 2);
         public static int Weather => Mathf.Clamp(PlayerPrefs.GetInt(WeatherKey, 1), 0, 3);
         public static float BestTime => PlayerPrefs.GetFloat(BestTimeKey, 0f);
-        public static int EngineLevel => PlayerPrefs.GetInt(EngineLevelKey, 1);
+        public static int EngineLevel => PlayerPrefs.GetInt(EngineLevelKeyForCar(SelectedCar), PlayerPrefs.GetInt(EngineLevelKey, 1));
         public static int SelectedCar => Mathf.Clamp(PlayerPrefs.GetInt(SelectedCarKey, 0), 0, 4);
         public static int SelectedEvent => Mathf.Clamp(PlayerPrefs.GetInt(SelectedEventKey, 0), 0, 4);
         public static string SelectedPaint => PlayerPrefs.GetString(SelectedPaintKey, "#D91E45");
@@ -75,14 +75,7 @@ namespace StreetVelocity.Progression
 
         public static bool TryUpgradeEngine(out int newLevel)
         {
-            newLevel = EngineLevel;
-            var cost = NextEngineUpgradeCost;
-            if (Credits < cost) return false;
-            AddCredits(-cost);
-            newLevel = EngineLevel + 1;
-            PlayerPrefs.SetInt(EngineLevelKey, newLevel);
-            PlayerPrefs.Save();
-            return true;
+            return TryUpgradePart(0, out newLevel);
         }
 
         public static bool TryUpgradePart(int partIndex, out int newLevel)
@@ -93,13 +86,14 @@ namespace StreetVelocity.Progression
             if (level >= 10 || Credits < PartUpgradeCost(partIndex)) return false;
             AddCredits(-PartUpgradeCost(partIndex));
             newLevel = level + 1;
-            if (partIndex == 0) PlayerPrefs.SetInt(EngineLevelKey, newLevel);
+            if (partIndex == 0) PlayerPrefs.SetInt(EngineLevelKeyForCar(SelectedCar), newLevel);
             else PlayerPrefs.SetInt(PartLevelKey(partIndex), newLevel);
             PlayerPrefs.Save();
             return true;
         }
 
         private static string PartLevelKey(int partIndex) => $"StreetVelocity.Car{SelectedCar}.Part{partIndex}Level";
+        private static string EngineLevelKeyForCar(int carIndex) => $"StreetVelocity.Car{Mathf.Clamp(carIndex, 0, 4)}.EngineLevel";
 
         public static void SelectCar(int index)
         {
