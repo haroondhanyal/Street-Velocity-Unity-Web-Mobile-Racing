@@ -24,10 +24,53 @@
     const bottomHalf = width * 0.49;
     const phase = (state.distance * 0.075) % 1;
 
+    // Retro coastal skyline: a warm horizon, art-deco towers, palms and neon.
+    const sky = ctx.createLinearGradient(0, 0, 0, horizon + 24);
+    sky.addColorStop(0, state.weather === 'Clear (Day)' ? '#3487aa' : '#101b47');
+    sky.addColorStop(0.52, state.weather === 'Clear (Day)' ? '#f5a36a' : '#8b356d');
+    sky.addColorStop(1, state.weather === 'Clear (Day)' ? '#ffd48a' : '#ff8b70');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, width, horizon + 24);
+    const sunX = width * 0.73, sunY = horizon * 0.56, sunR = Math.min(width, height) * 0.105;
+    const sunGlow = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, sunR * 1.8);
+    sunGlow.addColorStop(0, 'rgba(255,224,165,.95)'); sunGlow.addColorStop(.42, 'rgba(255,130,130,.6)'); sunGlow.addColorStop(1, 'rgba(255,80,150,0)');
+    ctx.fillStyle = sunGlow; ctx.fillRect(sunX - sunR * 2, sunY - sunR * 2, sunR * 4, sunR * 4);
+    ctx.fillStyle = '#ffd39a'; ctx.beginPath(); ctx.arc(sunX, sunY, sunR * .68, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#b74e78';
+    for (let stripe = 0; stripe < 5; stripe++) ctx.fillRect(sunX - sunR * .7, sunY + sunR * (.1 + stripe * .19), sunR * 1.4, Math.max(2, sunR * .055));
+    const skylineSeed = [0.08,0.14,0.07,0.2,0.1,0.16,0.06,0.13,0.21,0.09,0.15,0.07,0.18,0.11,0.06];
+    skylineSeed.forEach((ratio, i) => {
+      const x = (i / skylineSeed.length) * width;
+      const bw = width / skylineSeed.length + 2;
+      const bh = horizon * ratio;
+      const by = horizon - bh;
+      ctx.fillStyle = i % 3 === 0 ? '#25264a' : '#20223e';
+      ctx.fillRect(x, by, bw, bh);
+      if (i % 4 === 1) { ctx.fillStyle = '#f76fa0'; ctx.fillRect(x + bw * .42, by - 8, 2, 8); }
+      ctx.fillStyle = 'rgba(255,208,155,.58)';
+      for (let wy = by + 7; wy < horizon - 3; wy += 11) for (let wx = x + 5; wx < x + bw - 3; wx += 9) {
+        if (((Math.floor(wx + wy) + i) % 3) === 0) ctx.fillRect(wx, wy, 2, 3);
+      }
+    });
+    // Palm silhouettes animate with the roadside flow.
+    for (let i = 0; i < 6; i++) {
+      const t = ((i / 6 + phase * .16) % 1);
+      const y = horizon + (height - horizon) * t * t * .55;
+      const edge = topHalf + (bottomHalf - topHalf) * t;
+      const side = i % 2 ? 1 : -1;
+      const x = center + side * (edge + 18 + t * 46);
+      const scale = .18 + t * .9;
+      ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+      ctx.strokeStyle = '#131b32'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(side * 5, -27, 0, -58); ctx.stroke();
+      ctx.lineWidth = 3;
+      for (let f = -3; f <= 3; f++) { ctx.beginPath(); ctx.moveTo(0, -58); ctx.quadraticCurveTo(f * 10, -72, f * 22, -64 + Math.abs(f) * 4); ctx.stroke(); }
+      ctx.restore();
+    }
+
     const road = ctx.createLinearGradient(0, horizon, 0, height);
-    road.addColorStop(0, '#344154');
-    road.addColorStop(0.4, '#182334');
-    road.addColorStop(1, '#080d15');
+    road.addColorStop(0, '#574153');
+    road.addColorStop(0.4, '#25243a');
+    road.addColorStop(1, '#090d19');
     ctx.fillStyle = road;
     ctx.beginPath();
     ctx.moveTo(center - topHalf, horizon);
@@ -38,7 +81,7 @@
     ctx.fill();
 
     ctx.lineWidth = 2;
-    ctx.strokeStyle = state.settings?.vfx === false ? 'rgba(93,128,150,.5)' : 'rgba(47,218,255,.72)';
+    ctx.strokeStyle = state.settings?.vfx === false ? 'rgba(255,170,150,.42)' : 'rgba(45,224,255,.82)';
     ctx.beginPath();
     ctx.moveTo(center - topHalf, horizon);
     ctx.lineTo(center - bottomHalf, height);
@@ -53,7 +96,7 @@
         const half = topHalf + (bottomHalf - topHalf) * t;
         const dash = 2 + t * 23;
         const x = center - half + (2 * half * lane / 3);
-        ctx.fillStyle = 'rgba(228,244,255,.7)';
+      ctx.fillStyle = 'rgba(255,221,192,.82)';
         ctx.fillRect(x - dash * 0.035, y, Math.max(2, dash * 0.09), dash);
       }
     }

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111427">
+  <title>Speed Velocity — Velocity Bay</title>
+  <link rel="stylesheet" href="./src/style.css">
+  <link rel="stylesheet" href="./src/gameplay.css">
+  <style>.boot-error{position:fixed;z-index:20;inset:0;display:grid;place-items:center;background:#101326;color:#f5f2ed;padding:24px;text-align:center;font-family:Arial,sans-serif}.boot-error.hidden{display:none}.boot-error>div{max-width:460px;padding:30px;background:#191b30;border:1px solid #ff5fa2}.boot-error b{color:#ff5fa2;letter-spacing:2px}.boot-error p{color:#c6cada;line-height:1.6}.boot-error button{padding:12px 18px;background:#ff5fa2;color:#101326;font-weight:800;border:0;cursor:pointer}</style>
+  <script type="importmap">
+    {"imports":{"three":"./vendor/three.module.js"}}
+  </script>
+</head>
+<body>
+  <canvas id="world"></canvas>
+  <div class="vignette"></div>
+  <header class="brandbar"><a class="brand" href="#">SV <span>SPEED<br>VELOCITY</span></a><div class="district-label"><i></i> VELOCITY BAY <small>OCEAN BOULEVARD</small></div><button class="round-button" data-open="settings" aria-label="Settings">⚙</button></header>
+  <main id="game-ui" class="hidden">
+    <section class="hud-top"><div class="stat-card"><small>V-BAY TIME</small><b id="clock">18:42</b></div><div class="wallet-card"><small>CREDITS</small><b id="money">◉ 12,500</b></div><div class="rep-card"><small id="rank-label">ROOKIE DRIVER · 0 REP</small><div class="rep-track"><i id="career-xp"></i></div></div><div class="health-card"><small>HEALTH</small><b id="health">♥ 100</b></div><div class="heat-card"><small>HEAT</small><b id="heat">☆☆☆☆☆</b></div></section>
+    <section class="mission-card"><small id="mission-kicker">VELOCITY BAY · FREE ROAM</small><b id="objective">Explore the city. Find your car.</b><span id="mission-hint">Press E near the car to get in</span><time id="mission-timer">00:00</time></section>
+    <section class="chapter-screen hidden" id="chapter-screen" aria-live="polite">
+      <div class="chapter-art"><span>VELOCITY<br> BAY</span><i></i></div><div class="chapter-copy"><small id="chapter-label">CHAPTER 01 · HOMECOMING</small><h1 id="chapter-title">FIRST LIGHT</h1><p id="chapter-brief">A new drive begins.</p><div class="chapter-objective"><b>YOUR OBJECTIVE</b><span id="chapter-objective-text">Reach the coastal checkpoint</span></div><div class="chapter-footer"><span id="chapter-reward">◉ 800 CREDITS</span><button data-screen-action="begin-chapter">START CHAPTER <b>↗</b></button></div></div>
+    </section>
+    <section class="complete-screen hidden" id="complete-screen" aria-live="polite">
+      <div class="complete-mark">✓</div><small id="complete-chapter">CHAPTER 01 COMPLETE</small><h1 id="complete-title">FIRST LIGHT</h1><p id="complete-copy">You made your mark on Velocity Bay.</p><div class="complete-rewards"><span><b id="complete-credits">+◉ 800</b><small>CREDITS</small></span><span><b id="complete-rep">+100 REP</b><small>CAREER REPUTATION</small></span><span><b id="complete-time">00:00</b><small>BEST DRIVE TIME</small></span></div><button data-screen-action="continue-story">CONTINUE STORY <b>↗</b></button>
+    </section>
+    <section class="fail-screen hidden" id="fail-screen" aria-live="assertive"><div><small>DRIVE FAILED</small><h1 id="fail-title">CAR WRECKED</h1><p id="fail-copy">The route is still waiting. Repair and try again.</p><button data-screen-action="retry-mission">RETRY DRIVE <b>↻</b></button><button class="fail-city" data-screen-action="leave-failed-drive">RETURN TO CITY</button></div></section>
+    <section class="story-card hidden" id="story-card" aria-live="polite" aria-label="Story dialogue">
+      <div class="story-kicker"><span>VELOCITY BAY ORIGINAL STORY</span><b id="story-count">01 / 03</b></div>
+      <small id="story-chapter">CHAPTER 01 · HOMECOMING</small>
+      <h2 id="story-title">FIRST LIGHT</h2>
+      <div class="story-line"><div class="story-portrait" id="story-portrait">MC</div><div><b id="story-speaker">MAYA CRUZ</b><p id="story-dialogue"></p></div></div>
+      <div class="story-actions"><button data-story-action="skip">SKIP SCENE <kbd>ESC</kbd></button><button class="story-next" id="story-next" data-story-action="next">CONTINUE <span>↗</span></button></div>
+    </section>
+    <canvas id="minimap" width="180" height="180" aria-label="City minimap"></canvas>
+    <section id="drive-hud" class="drive-hud hidden"><div class="speed-ring"><b id="speed">000</b><small>KM/H</small></div><div class="car-state"><span>ENGINE</span><b id="engine-state">READY</b><div class="meter"><i></i></div></div></section>
+    <div id="toast" class="toast"></div>
+    <div class="interaction" id="interaction"><kbd>E</kbd><span>ENTER RETRO SPORT</span></div>
+    <div class="help">WASD MOVE / DRIVE <b>·</b> E ENTER / EXIT ANY CAR <b>·</b> M MAP <b>·</b> ESC PAUSE</div>
+    <section class="touch-controls"><button data-touch="left">◀</button><button data-touch="right">▶</button><button data-touch="brake">BRAKE</button><button data-touch="gas">GAS</button><button data-touch="enter">E</button></section>
+  </main>
+  <section id="overlay" class="overlay">
+    <div class="dialog home-dialog">
+      <div class="cover-art"></div>
+      <div class="home-copy"><div class="eyebrow">A NEON COAST ADVENTURE</div><h1>SPEED<br><em>VELOCITY</em></h1><p>Welcome to Velocity Bay. The coast is warm, the streets are yours.</p><div class="menu-actions"><button class="pink-button" data-action="start">START GAME <span>↗</span></button><button data-action="load">LOAD / CONTINUE</button><button data-action="free-roam">FREE ROAM</button><button data-open="missions">STORY MISSIONS</button><button data-open="map">CITY MAP</button><button data-open="garage">GARAGE</button><button data-open="settings">SETTINGS</button></div><small class="version">WEB VERTICAL SLICE · AUTOSAVE ON THIS DEVICE</small></div>
+    </div>
+    <div id="panel" class="dialog panel-dialog hidden"></div>
+  </section>
+  <section id="boot-error" class="boot-error hidden" role="alert"><div><b>GAME COULDN’T START</b><p id="boot-error-message">The 3D game failed to load.</p><button onclick="location.reload()">RELOAD GAME</button></div></section>
+  <script type="module">
+    import('./src/main.js').catch(error => {
+      console.error('Speed Velocity failed to start:', error);
+      document.querySelector('#boot-error-message').textContent = error?.message || 'The 3D game failed to load.';
+      document.querySelector('#boot-error').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

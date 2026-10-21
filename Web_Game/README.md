@@ -1,6 +1,6 @@
 # Street Velocity — Web Game
 
-A responsive neon racing game for desktop browsers and phone screens. Phase 1 includes 22 reference-inspired screens, saved garage/career state, daily rewards, and persistent settings. Phase 2 provides keyboard and touch arcade driving. Phase 3 adds countdown races, five event formats, route/checkpoint progress, results, placement rewards, XP, achievements, and local career saves.
+A browser-first retro coastal street racing game for desktop and mobile. Street Velocity: Neon Coast uses an original sunset-and-neon city style inspired by 1980s coastal arcade racers. The Web Game is the primary playable version; it needs no Unity install or account. It includes career, garage, five event formats, keyboard and touch driving, race results, progression, and local saves.
 
 ## Run
 
@@ -10,7 +10,7 @@ From the repository root:
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/Web_Game/`. On phones, install the landscape PWA from the browser menu. Browser progress is stored on that device.
+Open `http://localhost:8000/Web_Game/`. Play directly in the browser or install it from the browser menu as a PWA. Desktop keyboards and mobile touch controls are supported. Browser progress is stored on that device.
 
 ## Driving and events
 
