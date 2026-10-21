@@ -8,3 +8,34 @@
 .race-wheel:active{cursor:grabbing}
 .custom-summary{align-self:end;margin:0 0 16px;padding:8px 12px;background:#06101dcc;border:1px solid var(--line);color:#c8d7e8;font:700 13px var(--display);letter-spacing:.5px}
 .custom-options{margin:10px 0 18px}
+
+/* Neon Coast: warm sunset tones with electric cyan and rose highlights. */
+:root{--cyan:#42e8ff;--pink:#ff4f9a;--gold:#ffc66d;--blue:#348fff}
+.hero{background-image:linear-gradient(110deg,rgba(7,10,24,.95),rgba(17,15,40,.45) 52%,rgba(255,81,136,.08)),url('assets/neon-district.png');background-position:center 56%;box-shadow:inset 0 0 80px #080b1b66,0 18px 50px #0005}
+.hero:before{background:linear-gradient(90deg,rgba(5,8,22,.94),rgba(7,10,26,.7) 28%,rgba(7,10,26,.08) 70%),linear-gradient(0deg,rgba(8,9,26,.68),transparent 52%)}
+.hero:after{background:linear-gradient(115deg,transparent 48%,rgba(255,69,143,.16) 67%,transparent 77%);mix-blend-mode:screen}
+.hero-logo span,.splash-logo span{color:#ff5596;text-shadow:0 0 24px #ff388877}
+.btn.primary{background:linear-gradient(100deg,#ffd180,#ff9c71);box-shadow:0 0 24px #ff9b7152}
+.btn.cyan{background:linear-gradient(100deg,#39eaff,#5c8dff)}
+.race-world{background-image:linear-gradient(0deg,#090c19e8,transparent 48%),url('assets/worlds/harbor-night.jpg');background-size:cover;background-position:center 58%;animation:drive 8s ease-in-out infinite}
+.race-world:after{background:linear-gradient(0deg,#080b17e8,transparent 32%),linear-gradient(90deg,#10112d66,transparent 48%,#28112e66)}
+.hud-card,.speedometer{box-shadow:0 8px 26px #09091975,0 0 18px #ff72a522}
+.race-hud{filter:drop-shadow(0 2px 5px #080816aa)}
+.world-card,.weather-card{transition:transform .2s ease,border-color .2s ease,filter .2s ease;background-size:cover;background-position:center}
+.world-card:hover,.weather-card:hover{transform:translateY(-3px);border-color:#ff70a5}
+.panel{box-shadow:0 12px 34px #0003}
+.stat-chip{backdrop-filter:blur(8px);border-color:#ff8dad55}
+.splash{background-image:linear-gradient(90deg,#080a1bde,#15122c55 65%,#080a1b88),linear-gradient(0deg,#080a1bcc,transparent 55%),url('assets/neon-district.png');background-position:center 55%}
+@media(max-width:680px){.hero{background-position:62% center}.race-world{background-position:60% center}}
+.mini-map{border-radius:50%;background:radial-gradient(ellipse at 50% 50%,#48bba966 0 5%,transparent 6%),radial-gradient(ellipse at 50% 50%,#0c2637 0 43%,#e7a86a 44% 46%,#123145 47%);box-shadow:0 0 0 3px #07111d,0 0 20px #38e6ff55}
+.mini-map:before{width:56px;height:115%;left:29%;top:-7%;border:3px solid #ffe0a7;transform:rotate(34deg);box-shadow:0 0 8px #fff1bb}
+.mini-map:after{content:'▲';left:48%;top:41%;color:#ff5a98;text-shadow:0 0 10px #ff5a98}
+.pause-overlay{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(5,8,24,.72);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
+.pause-overlay.open{opacity:1;visibility:visible}
+.pause-card{width:min(390px,calc(100% - 36px));padding:30px;background:linear-gradient(150deg,#11152cec,#090c1beF);border:1px solid #ff70a588;box-shadow:0 0 44px #ff4c9650;text-align:center}
+.pause-card h2{margin:8px 0 20px;font:900 36px/.95 var(--display);font-style:italic}
+.pause-card .btn{width:100%;margin-bottom:12px}
+.pause-link{display:block;width:100%;padding:11px;background:transparent;text-align:center;color:#d7dff0;font:800 15px var(--display);letter-spacing:1px;border-top:1px solid #ffffff18}
+.pause-link:hover{color:#ff74a9;background:#ff5d9611}
+.map-art{background-color:#103e52;background-image:linear-gradient(0deg,#06101d88,#06101d22),radial-gradient(ellipse at 77% 26%,#38a88a77,transparent 22%),radial-gradient(ellipse at 21% 68%,#e5bc8277,transparent 24%),repeating-linear-gradient(28deg,transparent 0 34px,#e9d7af33 35px 39px),repeating-linear-gradient(115deg,transparent 0 47px,#f6d8a833 48px 52px),var(--district-art,url('assets/worlds/downtown-night.jpg'));background-blend-mode:normal,screen,screen,normal,normal,soft-light}
+.district{backdrop-filter:blur(5px)}

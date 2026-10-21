@@ -1,11 +1,10 @@
 {
-  "name": "Street Velocity",
+  "name": "Street Velocity: Neon Coast",
   "short_name": "Street Velocity",
-  "description": "Neon nights, city racing.",
+  "description": "A browser-first neon coastal street racing game.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
   "background_color": "#07101d",
   "theme_color": "#07101d",
   "icons": [{
