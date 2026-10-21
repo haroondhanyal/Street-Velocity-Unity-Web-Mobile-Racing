@@ -20,8 +20,7 @@ namespace StreetVelocity.EditorTools
         private const string SceneFolder = Root + "/Scenes";
         private static readonly string[] SceneNames =
         {
-            "00_Boot", "01_MainMenu", "02_Garage", "03_CareerMap", "04_CityNight",
-            "05_Highway", "06_Industrial", "07_Mountain", "08_TestTrack", "09_DriveTest"
+            "00_Boot", "01_MainMenu"
         };
 
         [MenuItem("Street Velocity/Phase 1/Setup Foundation")]
@@ -30,7 +29,6 @@ namespace StreetVelocity.EditorTools
             EnsureFolders();
             CreateBootScene();
             CreateMenuScene();
-            CreatePlaceholderScenes();
             var buildScenes = new List<EditorBuildSettingsScene>();
             foreach (var sceneName in SceneNames)
                 buildScenes.Add(new EditorBuildSettingsScene($"{SceneFolder}/{sceneName}.unity", true));
@@ -43,7 +41,7 @@ namespace StreetVelocity.EditorTools
 
         private static void EnsureFolders()
         {
-            string[] folders = { "Art", "Art/Cars", "Art/Environment", "Art/Materials", "Art/Textures", "Art/VFX", "Art/Lighting",
+            string[] folders = { "Art", "Art/Cars", "Art/Environment", "Art/Environment/worlds", "Art/Materials", "Art/Textures", "Art/VFX", "Art/Lighting",
                 "Audio", "Audio/Music", "Audio/Engine", "Audio/UI", "Audio/Environment", "Audio/Police",
                 "Prefabs", "Prefabs/Cars", "Prefabs/AI", "Prefabs/Police", "Prefabs/Environment", "Prefabs/UI", "Prefabs/Race",
                 "Scenes", "ScriptableObjects", "ScriptableObjects/Cars", "ScriptableObjects/Races", "ScriptableObjects/Tracks",
@@ -152,7 +150,7 @@ namespace StreetVelocity.EditorTools
             panel.GetComponent<Image>().color = new Color(0.035f, 0.055f, 0.09f, 1f);
             SetSerializedString(panel.GetComponent<T>(), "screenId", id);
             registered.Add(panel.GetComponent<T>());
-            var artwork = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Art/Environment/neon-district.png");
+            var artwork = ScreenArtwork(id);
             if (artwork != null)
             {
                 var artObject = new GameObject("Night City Artwork", typeof(RectTransform), typeof(RawImage));
@@ -401,12 +399,22 @@ namespace StreetVelocity.EditorTools
 
         private static Color ScreenArtTint(string id)
         {
-            if (id == "race" || id == "drift" || id == "police") return new Color(1f, 0.48f, 0.58f, 0.48f);
-            if (id == "garage" || id == "cars" || id == "customize" || id == "upgrades") return new Color(0.42f, 0.78f, 1f, 0.5f);
-            if (id == "career" || id == "worlds" || id == "minimap") return new Color(0.35f, 1f, 0.82f, 0.48f);
-            if (id == "rewards" || id == "results") return new Color(1f, 0.78f, 0.3f, 0.52f);
-            if (id == "weather") return new Color(0.62f, 0.72f, 1f, 0.46f);
-            return new Color(0.55f, 0.72f, 0.9f, 0.42f);
+            if (id == "race" || id == "drift" || id == "police") return new Color(1f, 0.76f, 0.84f, 0.76f);
+            if (id == "garage" || id == "cars" || id == "customize" || id == "upgrades") return new Color(0.8f, 0.92f, 1f, 0.72f);
+            if (id == "career" || id == "worlds" || id == "minimap") return new Color(0.78f, 1f, 0.92f, 0.78f);
+            if (id == "rewards" || id == "results") return new Color(1f, 0.9f, 0.68f, 0.76f);
+            if (id == "weather") return new Color(0.84f, 0.92f, 1f, 0.74f);
+            return new Color(0.82f, 0.9f, 1f, 0.74f);
+        }
+
+        private static Texture2D ScreenArtwork(string id)
+        {
+            var file = "downtown-night.jpg";
+            if (id == "garage" || id == "customize" || id == "upgrades") file = "industrial-zone.jpg";
+            else if (id == "worlds" || id == "minimap") file = "mountain-pass.jpg";
+            else if (id == "weather" || id == "events") file = "harbor-night.jpg";
+            var districtArt = AssetDatabase.LoadAssetAtPath<Texture2D>($"{Root}/Art/Environment/worlds/{file}");
+            return districtArt != null ? districtArt : AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Art/Environment/neon-district.png");
         }
 
         private static Rect ScreenArtCrop(string id)

@@ -69,6 +69,7 @@ namespace StreetVelocity.EditorTools
         {
             var environment = new GameObject("Neon City Driving Test");
             environment.AddComponent<RaceEnvironmentController>();
+            environment.AddComponent<AmbientStreetLife>();
             var ground = Material("Wet Asphalt", new Color(0.025f, 0.045f, 0.075f), 0.3f);
             var asphalt = Material("Road Asphalt", new Color(0.055f, 0.07f, 0.095f), 0.45f);
             var cyan = Material("Neon Cyan", new Color(0.02f, 0.55f, 0.8f), 0.25f, new Color(0.05f, 0.9f, 1f));
@@ -78,18 +79,43 @@ namespace StreetVelocity.EditorTools
             Cube("Main Street", new Vector3(0f, -0.18f, 1100f), new Vector3(19f, 0.25f, 2220f), asphalt, environment.transform);
             Cube("Left Neon Curb", new Vector3(-9.65f, 0.02f, 1100f), new Vector3(0.18f, 0.22f, 2220f), cyan, environment.transform);
             Cube("Right Neon Curb", new Vector3(9.65f, 0.02f, 1100f), new Vector3(0.18f, 0.22f, 2220f), pink, environment.transform);
-            Cube("Left Safety Barrier", new Vector3(-10.7f, 0.55f, 1100f), new Vector3(0.4f, 1.2f, 2220f), ground, environment.transform);
-            Cube("Right Safety Barrier", new Vector3(10.7f, 0.55f, 1100f), new Vector3(0.4f, 1.2f, 2220f), ground, environment.transform);
+            var sidewalk = Material("City Sidewalk", new Color(0.16f, 0.19f, 0.22f), 0.08f);
+            var storefront = Material("Storefront Glass", new Color(0.035f, 0.16f, 0.2f), 0.55f, new Color(0.015f, 0.16f, 0.21f));
+            Cube("Left Sidewalk", new Vector3(-13f, -0.19f, 1100f), new Vector3(6f, 0.28f, 2220f), sidewalk, environment.transform);
+            Cube("Right Sidewalk", new Vector3(13f, -0.19f, 1100f), new Vector3(6f, 0.28f, 2220f), sidewalk, environment.transform);
+            Cube("Left Outer Curb", new Vector3(-10.05f, 0.015f, 1100f), new Vector3(0.3f, 0.22f, 2220f), lane, environment.transform);
+            Cube("Right Outer Curb", new Vector3(10.05f, 0.015f, 1100f), new Vector3(0.3f, 0.22f, 2220f), lane, environment.transform);
             for (var z = 8f; z < 2200f; z += 17f)
             {
                 Cube("Lane Dash", new Vector3(0f, -0.045f, z), new Vector3(0.18f, 0.03f, 7.5f), lane, environment.transform);
                 BuildSideBlock(z, -1, environment.transform, cyan, pink);
                 BuildSideBlock(z + 8f, 1, environment.transform, pink, cyan);
                 if (((int)z) % 68 == 8) BuildStreetLight(z, environment.transform, cyan, pink);
+                if (((int)z) % 204 == 8) BuildIntersection(z + 5f, environment.transform, asphalt, lane);
+                if (((int)z) % 51 == 8) BuildStreetProp(z + 12f, ((int)z) % 2 == 0 ? -1 : 1, environment.transform, storefront, cyan, pink);
             }
             RenderSettings.fog = true;
             RenderSettings.fogColor = new Color(0.035f, 0.075f, 0.12f);
             RenderSettings.fogDensity = 0.003f;
+        }
+
+        private static void BuildIntersection(float z, Transform parent, Material asphalt, Material markings)
+        {
+            Cube("Cross Street", new Vector3(0f, -0.17f, z), new Vector3(62f, 0.22f, 15f), asphalt, parent);
+            for (var i = -4; i <= 4; i++)
+            {
+                Cube("Crosswalk Stripe", new Vector3(i * 1.8f, -0.035f, z - 6f), new Vector3(0.95f, 0.035f, 3.5f), markings, parent);
+                Cube("Crosswalk Stripe", new Vector3(i * 1.8f, -0.035f, z + 6f), new Vector3(0.95f, 0.035f, 3.5f), markings, parent);
+            }
+        }
+
+        private static void BuildStreetProp(float z, int side, Transform parent, Material glass, Material cyan, Material pink)
+        {
+            var x = side * 11.8f;
+            var shelter = Cube("Bus Stop Shelter", new Vector3(x, 1.5f, z), new Vector3(3.8f, 2.9f, 0.22f), glass, parent);
+            shelter.GetComponent<Collider>().enabled = false;
+            Cube("Bus Stop Roof", new Vector3(x, 3.05f, z), new Vector3(4.2f, 0.16f, 1.8f), side < 0 ? cyan : pink, parent);
+            Cube("Bus Stop Bench", new Vector3(x, 0.55f, z - 0.55f), new Vector3(2.5f, 0.18f, 0.45f), Material("Street Furniture", new Color(0.09f, 0.12f, 0.15f), 0.5f), parent);
         }
 
         private static void BuildSideBlock(float z, int side, Transform parent, Material first, Material second)

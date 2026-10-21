@@ -1,23 +1,34 @@
-# Street Velocity — Mobile Racing Game
+# Street Velocity — Web Racing Game
 
-Street Velocity is a neon night racer for landscape Android/iOS, with a separately maintained responsive browser edition. Phases 1–4 include 22 reference-inspired screens, career and garage flows, mobile touch/wheel/tilt controls, five race events, rewards and local progression, eight purchasable performance parts per car, and prototype traffic, rivals, and police actors. The browser edition also has its own race rendering with drift scoring and time trial targets.
+Street Velocity is a neon night racer with separate responsive web and landscape Android/iOS editions. Phases 1–4 include 22 reference-inspired screens, career and garage flows, mobile touch/wheel/tilt controls, five race events, rewards and local progression, eight purchasable performance parts per car, and prototype traffic, rivals, and police actors. The browser edition also has its own race rendering with drift scoring and time trial targets.
 
-## Game screenshots
+## New 3D prototype: Speed Velocity
 
-These are captures from the browser edition. Unity screenshots require opening the generated scenes in Unity Editor.
+The original `Web_Game/` remains the established arcade racer. A separate Three.js vertical slice in [`speed-velocity/`](speed-velocity/README.md) adds a walkable coastal city, a drivable car, checkpoints, map, and menus. Run it from the repository root with `python3 -m http.server 8001` and open [http://localhost:8001/speed-velocity/](http://localhost:8001/speed-velocity/).
 
-| Desktop game | Phone layout |
+## Screenshots
+
+| Desktop game | Career map |
 | --- | --- |
-| ![Street Velocity desktop game](Web_Game/screenshots/web-home.png) | ![Street Velocity phone game](Web_Game/screenshots/mobile-browser.png) |
+| ![Street Velocity web home screen](Web_Game/screenshots/web-home.png) | ![Street Velocity career map](Web_Game/screenshots/web-career.png) |
 
-Career map: ![Street Velocity career map](Web_Game/screenshots/web-career.png)
+Phone layout:
 
-## Unity Android/iOS setup
+![Street Velocity phone browser layout](Web_Game/screenshots/mobile-browser.png)
 
-Follow [`UNITY_SETUP_CHECKLIST.md`](UNITY_SETUP_CHECKLIST.md) to generate scenes and play. Unity 2022.3 LTS or newer is required. The generated native prototype includes sprint, a three-stage circuit route, drift scoring, a 15-second time trial, moving rivals, traffic, and police pursuit actors. Rivals affect place/rewards, and sustained police proximity can bust the player. Unity's circuit currently uses a straight generated street; advanced opponent driving, production 3D assets, and device QA remain future work. Unity Editor compilation and device builds have not been run in this workspace.
+The newer Speed Velocity web game also has updated desktop and phone-sized screenshots in [`speed-velocity/screenshots/`](speed-velocity/screenshots/).
 
-## Web edition
+## Run locally
 
-The browser game is on [`main`](https://github.com/haroondhanyal/Street-Velocity-Unity-Web-Mobile-Racing/tree/main). Run `python3 -m http.server 8000` from the repository root and open `http://localhost:8000/Web_Game/`.
+```sh
+python3 -m http.server 8000
+```
 
-Browser localStorage and Unity PlayerPrefs saves are separate and do not sync.
+Open [http://localhost:8000/](http://localhost:8000/) or [http://localhost:8000/Web_Game/](http://localhost:8000/Web_Game/).
+
+## Controls
+
+- Desktop: WASD or arrow keys to steer and accelerate, Down or Space to brake, Shift to drift, and N for nitro.
+- Touch: on-screen steering, throttle, brake, drift, and nitro controls.
+
+Progress is saved locally in the browser. See [`Web_Game/README.md`](Web_Game/README.md) for race flow and storage details. For Unity Android/iOS source, switch to the [`mobile` branch](https://github.com/haroondhanyal/Street-Velocity-Unity-Web-Mobile-Racing/tree/mobile).
