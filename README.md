@@ -16,7 +16,24 @@ Phone layout:
 
 ![Street Velocity phone browser layout](Web_Game/screenshots/mobile-browser.png)
 
-The newer Speed Velocity web game also has updated desktop and phone-sized screenshots in [`speed-velocity/screenshots/`](speed-velocity/screenshots/).
+### Speed Velocity full app gallery
+
+These screenshots cover the complete web app and its phone-sized responsive layout.
+
+| App screen | Desktop | Phone |
+| --- | --- | --- |
+| Home | ![Home screen on desktop](speed-velocity/screenshots/01-home.png) | ![Home screen on phone](speed-velocity/screenshots/mobile-01-home.png) |
+| Save slots | ![Save slots on desktop](speed-velocity/screenshots/02-save-slots.png) | ![Save slots on phone](speed-velocity/screenshots/mobile-02-save-slots.png) |
+| Character | ![Character screen on desktop](speed-velocity/screenshots/03-character.png) | ![Character screen on phone](speed-velocity/screenshots/mobile-03-character.png) |
+| Game modes | ![Game modes on desktop](speed-velocity/screenshots/04-modes.png) | ![Game modes on phone](speed-velocity/screenshots/mobile-04-modes.png) |
+| Missions | ![Missions on desktop](speed-velocity/screenshots/05-missions.png) | ![Missions on phone](speed-velocity/screenshots/mobile-05-missions.png) |
+| Career | ![Career screen on desktop](speed-velocity/screenshots/06-career.png) | ![Career screen on phone](speed-velocity/screenshots/mobile-06-career.png) |
+| Garage | ![Garage on desktop](speed-velocity/screenshots/07-garage.png) | ![Garage on phone](speed-velocity/screenshots/mobile-07-garage.png) |
+| City map | ![City map on desktop](speed-velocity/screenshots/08-city-map.png) | ![City map on phone](speed-velocity/screenshots/mobile-08-city-map.png) |
+| Settings | ![Settings on desktop](speed-velocity/screenshots/09-settings.png) | ![Settings on phone](speed-velocity/screenshots/mobile-09-settings.png) |
+| Pause menu | ![Pause menu on desktop](speed-velocity/screenshots/10-pause.png) | ![Pause menu on phone](speed-velocity/screenshots/mobile-10-pause.png) |
+| Code and build | ![Code and build screen on desktop](speed-velocity/screenshots/11-code-build.png) | ![Code and build screen on phone](speed-velocity/screenshots/mobile-11-code-build.png) |
+| Play / story intro | ![Play screen on desktop](speed-velocity/screenshots/12-play-game.png) | ![Play screen on phone](speed-velocity/screenshots/mobile-12-play-game.png) |
 
 ## Run locally
 

@@ -4,11 +4,22 @@ An original browser driving game with a React game menu and a code-built Three.j
 
 ## Screenshots
 
-The phone image shows the responsive web layout at a mobile viewport size.
+The gallery covers every React app screen. Phone captures use the responsive web layout at a 430 px viewport.
 
-| Desktop web | Mobile web |
-| --- | --- |
-| ![Speed Velocity desktop home screen](screenshots/web-desktop.png) | ![Speed Velocity mobile web layout](screenshots/mobile-web.png) |
+| App screen | Desktop | Phone |
+| --- | --- | --- |
+| Home | ![Home screen on desktop](screenshots/01-home.png) | ![Home screen on phone](screenshots/mobile-01-home.png) |
+| Save slots | ![Save slots on desktop](screenshots/02-save-slots.png) | ![Save slots on phone](screenshots/mobile-02-save-slots.png) |
+| Character | ![Character screen on desktop](screenshots/03-character.png) | ![Character screen on phone](screenshots/mobile-03-character.png) |
+| Game modes | ![Game modes on desktop](screenshots/04-modes.png) | ![Game modes on phone](screenshots/mobile-04-modes.png) |
+| Missions | ![Missions on desktop](screenshots/05-missions.png) | ![Missions on phone](screenshots/mobile-05-missions.png) |
+| Career | ![Career screen on desktop](screenshots/06-career.png) | ![Career screen on phone](screenshots/mobile-06-career.png) |
+| Garage | ![Garage on desktop](screenshots/07-garage.png) | ![Garage on phone](screenshots/mobile-07-garage.png) |
+| City map | ![City map on desktop](screenshots/08-city-map.png) | ![City map on phone](screenshots/mobile-08-city-map.png) |
+| Settings | ![Settings on desktop](screenshots/09-settings.png) | ![Settings on phone](screenshots/mobile-09-settings.png) |
+| Pause menu | ![Pause menu on desktop](screenshots/10-pause.png) | ![Pause menu on phone](screenshots/mobile-10-pause.png) |
+| Code and build | ![Code and build screen on desktop](screenshots/11-code-build.png) | ![Code and build screen on phone](screenshots/mobile-11-code-build.png) |
+| Play / story intro | ![Play screen on desktop](screenshots/12-play-game.png) | ![Play screen on phone](screenshots/mobile-12-play-game.png) |
 
 ## Start the full game
 
